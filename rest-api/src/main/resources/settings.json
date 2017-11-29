@@ -1,0 +1,13 @@
+{
+	"analysis": {
+		"analyzer": {
+			"case_insensitive": {
+				"tokenizer": "keyword",
+				"filter": [
+					"lowercase",
+					"uppercase"
+				]
+			}
+		}
+	}
+}

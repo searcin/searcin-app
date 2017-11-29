@@ -1,0 +1,16 @@
+.settings/
+.project
+admin-service/.settings/
+admin-service/target/
+admin-service/.classpath
+admin-service/.project
+
+repository-model/.settings/
+repository-model/target/
+repository-model/.classpath
+repository-model/.project
+
+rest-api/.settings/
+rest-api/target/
+rest-api/.classpath
+rest-api/.project

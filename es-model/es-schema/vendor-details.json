@@ -1,0 +1,117 @@
+{
+	"settings": {
+      "analysis": {
+         "analyzer": {
+            "case_insensitive": {
+               "tokenizer": "keyword",
+               "filter": [
+                  "lowercase",
+                  "uppercase"
+               ]
+            }
+         }
+      }
+   },
+   "mappings": {
+        "vendor-details": {
+            "properties": {
+                "name": {
+                    "type":"string",
+					"analyzer": "case_insensitive"
+                },
+                "description": {
+                    "type":"string",
+					"analyzer": "case_insensitive"
+                },
+                "category": {
+                    "type":"string",
+					"analyzer": "case_insensitive"
+                },
+                "category_id": {
+                	"type": "integer"
+                },
+                "sub_category": {
+                	"type":"string",
+					"analyzer": "case_insensitive"
+                },
+                "sub_category_id": {
+                	"type": "integer"
+                },
+                "class_range": {
+                    "type":"integer"
+                },
+				"created_on": {
+					"type":"date"
+				},
+				"services": {
+					"type":"string"
+				},
+				"area": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"doorno": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"building": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"nearby": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"address1": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"address2": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"pincode": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"location": {
+					"type":"geo_point"
+				},
+				"contact_name": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"phone": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"mobile": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"email": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"website": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"facebook": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"twitter": {
+					"type":"string",
+					"analyzer":"case_insensitive"
+				},
+				"logo": {
+					"type":"string"
+				},
+				"gallery": {
+					"type":"string"
+				}
+            }
+        }
+    }
+}

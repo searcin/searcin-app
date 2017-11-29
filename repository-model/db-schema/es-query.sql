@@ -1,0 +1,1 @@
+select v.id,v.name from vendors v
