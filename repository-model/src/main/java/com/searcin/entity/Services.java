@@ -26,6 +26,8 @@ public class Services extends Auditable {
 	@Column(name = "description")
 	private String description;
 
+	@Column(name = "is_active", insertable = false)
+	private Boolean isActive;
 
 	public Services() {
 
@@ -69,4 +71,19 @@ public class Services extends Auditable {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	public Boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	@Override
+	public String toString() {
+		return "Services [id=" + id + ", name=" + name + ", description=" + description + ", isActive=" + isActive
+				+ "]";
+	}
+
 }

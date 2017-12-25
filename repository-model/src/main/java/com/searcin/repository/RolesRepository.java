@@ -11,4 +11,6 @@ import com.searcin.entity.Roles;
 @Transactional
 public interface RolesRepository extends Repository<Roles, Integer> {
 	public List<Roles> findAll();
+
+	public Roles findById(Integer id);
 }

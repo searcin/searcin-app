@@ -4,6 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.searcin.constant.ImageType;
 
 @Component
 public class DataValidator {
@@ -13,9 +16,9 @@ public class DataValidator {
 
 	private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
 			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-	
+
 	private static final String MOBILE_PATTERN = "\\d{10}";
-	
+
 	private static final String PHONE_PATTERN = "\\d{6}";
 
 	public boolean email(String email) {
@@ -23,17 +26,21 @@ public class DataValidator {
 		matcher = pattern.matcher(email);
 		return matcher.matches();
 	}
-	
+
 	public boolean mobile(String mobile) {
 		pattern = Pattern.compile(MOBILE_PATTERN);
 		matcher = pattern.matcher(mobile);
 		return matcher.matches();
 	}
-	
+
 	public boolean phone(String phone) {
 		pattern = Pattern.compile(PHONE_PATTERN);
 		matcher = pattern.matcher(phone);
 		return matcher.matches();
 	}
-	
+
+	public boolean isValidImage(MultipartFile file) {
+		return file.getContentType().equals(ImageType.JPG.getValue())
+				|| file.getContentType().equals(ImageType.PNG.getValue());
+	}
 }

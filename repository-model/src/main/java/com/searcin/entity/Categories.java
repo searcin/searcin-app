@@ -1,4 +1,5 @@
 package com.searcin.entity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -11,24 +12,27 @@ import com.searcin.listener.CategoriesListener;
 
 @Entity
 @EntityListeners(CategoriesListener.class)
-@Table (name = "categories")
+@Table(name = "categories")
 public class Categories extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column (name = "id")
+	@Column(name = "id")
 	private Integer id;
-	
-	@Column (name = "name")
+
+	@Column(name = "name")
 	private String name;
-	
+
+	@Column(name = "is_active")
+	private Boolean isActive;
+
 	public Categories() {
-		
+
 	}
 
 	public Categories(Integer id) {
 		this.id = id;
 	}
-	
+
 	public Categories(Integer id, String name) {
 		this.id = id;
 		this.name = name;
@@ -49,8 +53,17 @@ public class Categories extends Auditable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
-	
-	
+
+	public Boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	@Override
+	public String toString() {
+		return "Categories [id=" + id + ", name=" + name + ", isActive=" + isActive + "]";
+	}
 }

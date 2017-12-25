@@ -5,8 +5,6 @@ import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.searcin.listener.ContactsListener;
@@ -19,13 +17,6 @@ public class Contacts extends Auditable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
-	
-	@OneToOne
-	@JoinColumn(name = "vendor_id")
-	private Vendors vendor;
-	
-	@Column(name = "name")
-	private String name;
 	
 	@Column(name = "phone")
 	private String phone;
@@ -51,22 +42,6 @@ public class Contacts extends Auditable {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public Vendors getVendor() {
-		return vendor;
-	}
-
-	public void setVendor(Vendors vendor) {
-		this.vendor = vendor;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getPhone() {

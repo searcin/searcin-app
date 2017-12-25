@@ -55,8 +55,15 @@ public interface Dto {
 		public static interface images {}
 	}
 	interface Asset {
-		public static interface key {}
+		public static interface id {}
 		public static interface url {}
-		public static interface audit extends key, url {}
+		public static interface audit extends id, url {}
+	}
+	interface User {
+		public static interface id {}
+		public static interface name {}
+		public static interface auth {}
+		public static interface roles {}
+		public static interface token {}
 	}
 }

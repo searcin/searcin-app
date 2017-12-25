@@ -22,4 +22,8 @@ public interface CategoriesService {
 	Categories findById(Integer id);
 
 	Page<Categories> findPage(Pageable pageable);
+
+	void trash(Integer id);
+
+	void restore(Integer id);
 }

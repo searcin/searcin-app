@@ -17,10 +17,14 @@ public interface AreasService {
 	
 	Areas save(Areas areas);
 
-	void delete(Areas area);
-
 	void deleteAll();
 
 	Areas findById(Integer id);
+	
+	void delete(Integer id);
+
+	void restore(Integer id);
+	
+	void trash(Integer id);
 
 }

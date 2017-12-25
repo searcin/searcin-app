@@ -19,7 +19,7 @@ public class ESNested {
 			mainField = @Field(type=FieldType.String, store = true, analyzer = "case_insensitive"),
 			otherFields = {
 					@InnerField(suffix="key", index = FieldIndex.analyzed, 
-							searchAnalyzer = "english",  indexAnalyzer = "english",
+							searchAnalyzer = "standard",  indexAnalyzer = "standard",
 						    store = true, type = FieldType.String)
 			})
 	private String name;

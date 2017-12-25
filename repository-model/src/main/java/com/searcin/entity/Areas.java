@@ -23,6 +23,9 @@ public class Areas extends Auditable {
 	@Column(name = "name")
 	private String name;
 	
+	@Column(name = "is_active",insertable=false)
+	private Boolean isActive;
+	
 	public Areas() {
 		
 	}
@@ -47,7 +50,17 @@ public class Areas extends Auditable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
 
+	public Boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	@Override
+	public String toString() {
+		return "Areas [id=" + id + ", name=" + name + ", isActive=" + isActive + "]";
+	}
 }

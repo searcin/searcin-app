@@ -15,9 +15,12 @@ import com.searcin.entity.Categories;
 @Transactional
 public interface CategoriesRepository extends Repository<Categories, Long> {
 	
-	@Query("select new Categories(c.id,c.name) from Categories c")
+	Categories findById(Integer id);
+	
+	@Query("select new Categories(c.id,c.name) from Categories c where c.isActive = true")
 	List<Categories> findNames();
 	
+	@Query("select c from Categories c where c.isActive = true")
 	List<Categories> findAll();
 
 	Categories save(Categories category);
@@ -25,8 +28,6 @@ public interface CategoriesRepository extends Repository<Categories, Long> {
 	void delete(Categories category);
 
 	void deleteAll();
-
-	Categories findById(Integer id);
 
 	Page<Categories> findAll(Pageable pageable);
 }

@@ -6,7 +6,7 @@ import com.searcin.entity.Users;
 
 public interface UsersService {
 
-	void save(Users user);
+	void saveUser(Users user);
 	
 	List<Users> findAll();
 	
@@ -14,4 +14,7 @@ public interface UsersService {
 	
 	Users findByUsername(String username);
 
+	Users findByUsernameAndPassword(String username, String password);
+	
+	String getToken(String username, List<String> roles);
 }

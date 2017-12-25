@@ -1,6 +1,8 @@
 package com.searcin.mapper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,20 +11,20 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.searcin.constant.AssetType;
 import com.searcin.document.ESAddresses;
 import com.searcin.document.ESAreas;
 import com.searcin.document.ESCategories;
 import com.searcin.document.ESContacts;
-import com.searcin.document.ESNested;
 import com.searcin.document.ESServices;
 import com.searcin.document.ESSubCategories;
 import com.searcin.document.ESVendors;
 import com.searcin.entity.Addresses;
 import com.searcin.entity.Areas;
 import com.searcin.entity.Categories;
-import com.searcin.entity.Contacts;
 import com.searcin.entity.Services;
 import com.searcin.entity.SubCategories;
+import com.searcin.entity.VendorAsset;
 import com.searcin.entity.Vendors;
 
 @Component
@@ -52,38 +54,41 @@ public class ESMapper {
 	public ESVendors toES(Vendors vendor) {
 		ESVendors esVendor = new ESVendors();
 		new ModelMapper().createTypeMap(Vendors.class, ESVendors.class)
-			.addMappings(mapper -> mapper.skip(ESVendors::setServices)).map(vendor, esVendor);
-		esVendor.setServices(Optional.ofNullable(vendor.getServices())
-			.map(services -> {
-				return services.stream().map(item -> new ESNested(item.getId(), item.getName())).collect(Collectors.toList());
-			}).orElse(null));
+				.addMappings(mapper -> mapper.skip(ESVendors::setLogo))
+				.addMappings(mapper -> mapper.skip(ESVendors::setGallery))
+				.addMappings(mapper -> mapper.skip(ESVendors::setAddress))
+				.addMappings(mapper -> mapper.skip(ESVendors::setContact)).map(vendor, esVendor);		
+		String logo = null;
+		List<String> gallery = new ArrayList<>();		
+		List<VendorAsset> assets = vendor.getAssets();		
+		if(assets != null) {
+			logo = assets.stream().filter(item -> item.getAssetType().equals(AssetType.LOGO.getValue()))
+					.findFirst().map(item -> item.getMetadata()).orElse(null);
+			gallery = assets.stream().filter(item -> item.getAssetType().equals(AssetType.GALLERY.getValue()))
+					.map(item -> item.getMetadata()).collect(Collectors.toList());
+		}		
+		esVendor.setLogo(logo);
+		esVendor.setGallery(gallery);
+		esVendor.setAddress(toESAddress(vendor));
+		esVendor.setContact(toESContact(vendor));
 		return esVendor;
 	}
 
-	public ESAddresses toESAddress(Vendors vendor) {
+	private ESAddresses toESAddress(Vendors vendor) {
 		return Optional.ofNullable(vendor.getAddress()).map(address -> {
-			return toES(address);
+			ESAddresses esAddress = new ESAddresses();
+			new ModelMapper().createTypeMap(Addresses.class, ESAddresses.class)
+					.addMappings(mapper -> mapper.skip(ESAddresses::setLocation)).map(address, esAddress);
+			Map<String, Double> location = new HashMap<>();
+			location.put("lat", address.getLat());
+			location.put("lon", address.getLng());
+			esAddress.setLocation(location);
+			return esAddress;
 		}).orElse(null);
 	}
 
-	public ESContacts toESContact(Vendors vendor) {
-		return Optional.ofNullable(vendor.getContact()).map(contact -> {
-			return toES(contact);
-		}).orElse(null);
-	}
-
-	public ESAddresses toES(Addresses address) {
-		ESAddresses esAddress = new ESAddresses();
-		new ModelMapper().createTypeMap(Addresses.class, ESAddresses.class)
-				.addMappings(mapper -> mapper.skip(ESAddresses::setLocation)).map(address, esAddress);
-		Map<String, Double> location = new HashMap<>();
-		location.put("lat", address.getLat());
-		location.put("lon", address.getLng());
-		esAddress.setLocation(location);
-		return esAddress;
-	}
-
-	public ESContacts toES(Contacts contact) {
-		return modelMapper.map(contact, ESContacts.class);
+	private ESContacts toESContact(Vendors vendor) {
+		return Optional.ofNullable(vendor.getContact()).map(contact -> modelMapper.map(contact, ESContacts.class))
+				.orElse(null);
 	}
 }

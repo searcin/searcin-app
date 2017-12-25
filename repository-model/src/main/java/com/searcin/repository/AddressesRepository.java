@@ -14,6 +14,6 @@ public interface AddressesRepository extends Repository<Addresses,Long>{
 
 	Addresses save(Addresses addresses);
 
-	Addresses findByVendor_id(Integer id);
+	//Addresses findByVendor_id(Integer id);
 
 }

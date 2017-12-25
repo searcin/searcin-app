@@ -27,11 +27,14 @@ public class SubCategories extends Auditable {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Categories category;
-	
+
+	@Column(name = "is_active", insertable = false)
+	private Boolean isActive;
+
 	public SubCategories() {
-		
+
 	}
-	
+
 	public SubCategories(Integer id, String name) {
 		this.id = id;
 		this.name = name;
@@ -59,6 +62,19 @@ public class SubCategories extends Auditable {
 
 	public void setCategory(Categories category) {
 		this.category = category;
+	}
+
+	public Boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	@Override
+	public String toString() {
+		return "SubCategories [id=" + id + ", name=" + name + ", category=" + category + ", isActive=" + isActive + "]";
 	}
 
 }

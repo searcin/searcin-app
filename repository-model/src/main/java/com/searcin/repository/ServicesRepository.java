@@ -12,19 +12,21 @@ import org.springframework.data.repository.Repository;
 import com.searcin.entity.Services;
 
 @Transactional
-public interface ServicesRepository extends Repository<Services, Long>{
+public interface ServicesRepository extends Repository<Services, Long> {
 
-	@Query("select new Services(s.id,s.name,s.description) from Services s")
+	@Query("select s from Services s where s.isActive = true")
 	List<Services> findAll();
-	
-	@Query("select new Services(s.id,s.name) from Services s")
-	List<Services> findNames();
 
-	Services save(Services service);
+	@Query("select new Services(s.id,s.name) from Services s where s.isActive = true")
+	List<Services> findNames();
 
 	Services findById(Integer id);
 
-	Object delete(Services service);
+	Services save(Services service);
+
+	void delete(Services service);
+
+	void deleteAll();
 
 	Page<Services> findAll(Pageable pageable);
 

@@ -1,5 +1,6 @@
 package com.searcin.document;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -13,8 +14,7 @@ import org.springframework.data.elasticsearch.annotations.MultiField;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Document(indexName = "#{ESConfig.indexName}", type = "vendors")
-public class ESVendors {
-	
+public class ESVendors {	
 	@Id
 	private Integer id;
 
@@ -23,10 +23,13 @@ public class ESVendors {
 			mainField = @Field(type=FieldType.String, store = true, analyzer = "case_insensitive"),
 			otherFields = {
 					@InnerField(suffix="key", index = FieldIndex.analyzed, 
-							searchAnalyzer = "english",  indexAnalyzer = "english",
+							searchAnalyzer = "standard",  indexAnalyzer = "standard",
 						    store = true, type = FieldType.String)
 			})
 	private String name;
+	
+	@JsonProperty("owner_name")
+	private String ownerName;
 		
 	@JsonProperty("description")
 	private String description;
@@ -50,10 +53,13 @@ public class ESVendors {
 	private ESContacts contact;
 	
 	@JsonProperty("logo")
-	private List<String> logo;
+	private String logo;
 	
 	@JsonProperty("gallery")
 	private List<String> gallery;
+	
+	@JsonProperty("created_on")
+	private Date createdOn;
 
 	public Integer getId() {
 		return id;
@@ -69,6 +75,14 @@ public class ESVendors {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}
 
 	public String getDescription() {
@@ -127,11 +141,11 @@ public class ESVendors {
 		this.contact = contact;
 	}
 
-	public List<String> getLogo() {
+	public String getLogo() {
 		return logo;
 	}
 
-	public void setLogo(List<String> logo) {
+	public void setLogo(String logo) {
 		this.logo = logo;
 	}
 
@@ -142,5 +156,12 @@ public class ESVendors {
 	public void setGallery(List<String> gallery) {
 		this.gallery = gallery;
 	}
-	
+
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(Date createdOn) {
+		this.createdOn = createdOn;
+	}	
 }

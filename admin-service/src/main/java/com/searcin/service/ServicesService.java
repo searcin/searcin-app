@@ -20,5 +20,9 @@ public interface ServicesService {
 	void deleteById(Integer id);
 
 	Page<Services> findPage(Pageable pageable);
+
+	void trash(Integer id);
+
+	void restore(Integer id);
 	
 }

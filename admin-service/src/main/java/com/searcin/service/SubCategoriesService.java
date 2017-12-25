@@ -9,7 +9,7 @@ import com.searcin.entity.SubCategories;
 
 public interface SubCategoriesService {
 
-	SubCategories save(SubCategories subCategories);
+	SubCategories save(SubCategories subCategories, Integer id);
 
 	SubCategories findById(Integer id);
 
@@ -24,5 +24,9 @@ public interface SubCategoriesService {
 	List<SubCategories> findByCategoryId(Integer category_id);
 
 	Page<SubCategories> findByCategoryId(Integer id, Pageable pageable);
+
+	void trash(Integer id);
+
+	void restore(Integer id);
 
 }

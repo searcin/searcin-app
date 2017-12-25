@@ -22,8 +22,8 @@ public class ESServices {
 			analyzer = "case_insensitive"),
 			otherFields = {
 					@InnerField(suffix="key", index = FieldIndex.analyzed,
-							indexAnalyzer = "english",
-							searchAnalyzer = "english",
+							indexAnalyzer = "standard",
+							searchAnalyzer = "standard",
 						    store = true, type = FieldType.String)
 			})
 	private String name;
@@ -54,5 +54,4 @@ public class ESServices {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
 }

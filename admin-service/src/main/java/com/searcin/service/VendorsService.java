@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.searcin.entity.Addresses;
+import com.searcin.entity.Contacts;
 import com.searcin.entity.Vendors;
 
 public interface VendorsService {
@@ -30,5 +32,17 @@ public interface VendorsService {
 	Vendors detail(Integer id);
 
 	Page<Vendors> findNames(Pageable pageable);
+
+	void restore(Integer id);
+
+	void trash(Integer id);
+
+	Addresses findAddress(Integer id);
+
+	void saveAddress(Addresses address, Integer id);
+
+	void saveContact(Contacts entity, Integer id);
+
+	Contacts findContact(Integer id);
 
 }

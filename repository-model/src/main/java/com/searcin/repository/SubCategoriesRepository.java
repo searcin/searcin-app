@@ -13,6 +13,15 @@ import com.searcin.entity.SubCategories;
 
 @Transactional
 public interface SubCategoriesRepository extends Repository<SubCategories, Long> {
+	
+	@Query("select s from SubCategories s where s.isActive = true")
+	List<SubCategories> findAll();
+	
+	@Query("select new SubCategories(s.id,s.name) from SubCategories s where s.isActive = true")
+	List<SubCategories> findNames();
+	
+	@Query("select count(*) from SubCategories s where s.category.id = ?1")
+	Integer countByCategory(Integer id);
 
 	SubCategories save(SubCategories subCategories);
 
@@ -21,11 +30,6 @@ public interface SubCategoriesRepository extends Repository<SubCategories, Long>
 	void delete(SubCategories subCategory);
 	
 	void deleteAll();
-	
-	List<SubCategories> findAll();
-	
-	@Query("select new SubCategories(s.id,s.name) from SubCategories s")
-	List<SubCategories> findNames();
 
 	List<SubCategories> findByCategory_id(Integer id);
 

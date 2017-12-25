@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.searcin.document.ESVendors;
 import com.searcin.dto.AddressesDto;
 import com.searcin.dto.AreasDto;
+import com.searcin.dto.AssetsDto;
 import com.searcin.dto.CategoriesDto;
 import com.searcin.dto.ClassRangeDto;
 import com.searcin.dto.ContactsDto;
@@ -36,6 +37,7 @@ import com.searcin.entity.Roles;
 import com.searcin.entity.Services;
 import com.searcin.entity.SubCategories;
 import com.searcin.entity.Users;
+import com.searcin.entity.VendorAsset;
 import com.searcin.entity.Vendors;
 
 @Component
@@ -159,7 +161,7 @@ public class DataConverter {
 		Addresses addresses = modelMapper.map(addressesDto, Addresses.class);
 		Vendors vendors = new Vendors();
 		vendors.setId(id);
-		addresses.setVendor(vendors);
+		//addresses.setVendor(vendors);
 		return addresses;
 	}
 
@@ -208,11 +210,8 @@ public class DataConverter {
 	}
 
 	public Contacts toEntity(ContactsDto contactsDto, Integer id) {
-		Contacts contacts = modelMapper.map(contactsDto, Contacts.class);
-		Vendors vendors = new Vendors();
-		vendors.setId(id);
-		contacts.setVendor(vendors);
-		return contacts;
+		return modelMapper.map(contactsDto, Contacts.class);
+		
 	}
 
 	public ServicesDto toServiceDto(Services services) {
@@ -223,16 +222,14 @@ public class DataConverter {
 		return modelMapper.map(servicesDto, Services.class);
 	}
 
-	public Users toUserEntity(UsersDto userDto) {
-		Users user = modelMapper.map(userDto, Users.class);
-		user.setRoles(userDto.getRoles().stream().map(item -> toRolesEntity(item)).collect(Collectors.toList()));
-		return user;
-
+	public Users toEntity(UsersDto userDto) {
+		return modelMapper.map(userDto, Users.class);
 	}
 
-	public UsersDto toUserDto(Users user) {
-		UsersDto userDto = modelMapper.map(user, UsersDto.class);
-		userDto.setRoles(user.getRoles().stream().map(item -> toNameDto(item)).collect(Collectors.toList()));
+	public UsersDto toDto(Users user) {
+		UsersDto userDto = new UsersDto();
+		userDto = modelMapper.map(user, UsersDto.class);
+		userDto.setRoles(user.getRoles().stream().map(item -> item.getName()).collect(Collectors.toList()));
 		return userDto;
 	}
 
@@ -281,7 +278,8 @@ public class DataConverter {
 	public VendorsDto toDto(ESVendors vendor) {
 		return modelMapper.map(vendor, VendorsDto.class);
 	}
-	
-	
 
+	public AssetsDto toDto(VendorAsset logo) {
+		return new AssetsDto(logo.getId(), logo.getMetadata(), logo.getUpdatedBy(), logo.getUpdatedOn());
+	}
 }

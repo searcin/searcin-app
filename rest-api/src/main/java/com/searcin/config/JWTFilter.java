@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.GenericFilterBean;
 
-import com.searcin.utils.JWTParser;
+import com.searcin.utils.TokenGenerator;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureException;
@@ -28,7 +28,7 @@ public class JWTFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain)
 			throws IOException, ServletException {
-		JWTParser jwtParser = new JWTParser();
+		TokenGenerator jwtParser = new TokenGenerator();
 		HttpServletRequest request = (HttpServletRequest) req;
 		String authToken = request.getHeader("Authorization");
 		

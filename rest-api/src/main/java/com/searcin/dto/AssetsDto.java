@@ -6,41 +6,41 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.searcin.view.Dto;
 
 public class AssetsDto {
-	@JsonView(Dto.Asset.key.class)
-	private String key;
-	
+	@JsonView(Dto.Asset.id.class)
+	private Integer id;
+
 	@JsonView(Dto.Asset.url.class)
 	private String url;
-	
+
 	@JsonView(Dto.Asset.audit.class)
 	private String updatedBy;
-	
+
 	@JsonView(Dto.Asset.audit.class)
 	private Date updatedOn;
-	
+
 	public AssetsDto() {
-		
+
 	}
-	
+
 	public AssetsDto(String url) {
 		this.url = url;
 	}
-	
-	public AssetsDto(String key, String url, String updatedBy, Date updatedOn) {
-		this.key = key;
+
+	public AssetsDto(Integer id, String url, String updatedBy, Date updatedOn) {
+		this.id = id;
 		this.url = url;
 		this.updatedBy = updatedBy;
 		this.updatedOn = updatedOn;
 	}
 
-	public String getKey() {
-		return key;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
-	}	
-	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public String getUrl() {
 		return url;
 	}
@@ -64,6 +64,5 @@ public class AssetsDto {
 	public void setUpdatedOn(Date updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-	
-	
+
 }

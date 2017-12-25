@@ -10,8 +10,8 @@ public interface Views {
 	public static interface AreaAudit extends Dto.Area.id, Dto.Area.audit {}
 	
 	public static interface AssetList extends Dto.Asset.url {}
-	public static interface AssetListKey extends Dto.Asset.key, Dto.Asset.url {}
-	public static interface AssetAudit extends AssetListKey, Dto.Asset.audit {}
+	public static interface AssetListKey extends Dto.Asset.id, Dto.Asset.url {}
+	public static interface AssetAudit extends Dto.Asset.audit {}
 	
 	public static interface CategoryListId extends Dto.Category.id, Dto.Category.name {}
 	public static interface CategoryList extends Dto.Category.name {}
@@ -40,5 +40,7 @@ public interface Views {
 	public static interface VendorPanel extends Dto.Vendor.id, Dto.Vendor.name, Dto.Vendor.logo, Dto.Asset.url,
 													Dto.Vendor.description, Dto.Vendor.address, Dto.Address.name, Dto.Address.location,
 													Dto.Address.basic {}
+	
+	public static interface UserBasic extends Dto.User.name, Dto.User.roles, Dto.User.token {}
 }
 

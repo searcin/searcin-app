@@ -2,9 +2,14 @@ package com.searcin.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import org.elasticsearch.common.settings.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +36,8 @@ import com.searcin.service.IngestionService;
 @Service
 public class IngestionServiceImpl implements IngestionService {
 
+	private final Logger log = LoggerFactory.getLogger(IngestionServiceImpl.class);
+
 	@Value("${elasticsearch.index}")
 	private String indexName;
 
@@ -48,9 +55,18 @@ public class IngestionServiceImpl implements IngestionService {
 
 	@Autowired
 	private ESVendorsRepository esVendorsRepository;
-	
+
 	@Autowired
 	private ESServicesRepository esServicesRepository;
+
+	@PostConstruct
+	public void client() {
+		Boolean flag = elasticsearchTemplate.indexExists(indexName);
+		if (flag)
+			log.info("Index {} exists!", indexName);
+		else
+			log.error("Index {} doesn't exist!", indexName);
+	}
 
 	@Override
 	public void vendor(List<ESVendors> vendor) {
@@ -92,17 +108,16 @@ public class IngestionServiceImpl implements IngestionService {
 	public void reset() {
 		// delete the existing index
 		elasticsearchTemplate.deleteIndex(indexName);
-		
+
 		// case insensitive analyzer
 		Settings.Builder settings = Settings.builder();
-		settings.put("analysis.analyzer.case_insensitive.tokenizer","keyword");
+		settings.put("analysis.analyzer.case_insensitive.tokenizer", "keyword");
 		settings.put("analysis.analyzer.case_insensitive.filter", "lowercase,uppercase");
 		Map<String, String> expectedSettingsMap = settings.build().getAsMap();
-		
+
 		// create the index
 		elasticsearchTemplate.createIndex(indexName, expectedSettingsMap);
-		
-		
+
 		// put mapping
 		elasticsearchTemplate.putMapping(ESServices.class);
 		elasticsearchTemplate.putMapping(ESAreas.class);
@@ -127,7 +142,7 @@ public class IngestionServiceImpl implements IngestionService {
 	public void delete(ESAreas area) {
 		esAreasRepository.delete(area);
 	}
-	
+
 	@Override
 	public void save(ESAddresses address, Integer id) {
 		ESVendors vendor = esVendorsRepository.findOne(id);
@@ -172,15 +187,13 @@ public class IngestionServiceImpl implements IngestionService {
 	public void save(ESServices esService) {
 		esServicesRepository.save(esService);
 		esVendorsRepository.findByServiceId(esService.getId()).forEach(item -> {
-			item.setServices(item.getServices().stream()
-								.map(service -> {
-									
-									if(esService.getId() == service.getId())
-										service.setName(esService.getName());
-									
-									return service;
-								})
-								.collect(Collectors.toList()));
+			item.setServices(item.getServices().stream().map(service -> {
+
+				if (esService.getId() == service.getId())
+					service.setName(esService.getName());
+
+				return service;
+			}).collect(Collectors.toList()));
 			esVendorsRepository.save(item);
 		});
 	}
@@ -203,24 +216,42 @@ public class IngestionServiceImpl implements IngestionService {
 	@Override
 	public void update(ESVendors esVendor) {
 		ESVendors vendor = new ESVendors();
-		BeanUtils.copyProperties(esVendor, vendor, ESVendorFields.ADDRESS.getField(), 
-				ESVendorFields.CONTACT.getField(),ESVendorFields.GALLERY.getField(),ESVendorFields.LOGO.getField());
+		BeanUtils.copyProperties(esVendor, vendor, ESVendorFields.ADDRESS.getField(), ESVendorFields.CONTACT.getField(),
+				ESVendorFields.GALLERY.getField(), ESVendorFields.LOGO.getField());
 		esVendorsRepository.save(vendor);
 	}
 
 	@Override
-	public void save(List<String> collect, String type, Integer id) {
-		ESVendors esVendor = esVendorsRepository.findOne(id);
-		if(type.equals(ESVendorFields.LOGO.getField())) {			
-			esVendor.setLogo(collect);
-		}
-		else if(type.equals(ESVendorFields.GALLERY.getField())) {
-			esVendor.setGallery(collect);
-		}
-		else {
-			System.out.println("Not a valid type");
-		}
-		esVendorsRepository.save(esVendor);
+	public void saveLogo(String logo, Integer id) {
+		Optional.ofNullable(esVendorsRepository.findOne(id)).ifPresent(item -> {
+			item.setLogo(logo);
+			save(item);
+		});
 	}
-	
+
+	@Override
+	public void saveGallery(String metadata, Integer id) {
+		Optional.ofNullable(esVendorsRepository.findOne(id)).ifPresent(item -> {
+			item.getGallery().add(metadata);
+			save(item);
+		});
+	}
+
+	@Override
+	public void deleteLogo(Integer id) {
+		Optional.ofNullable(esVendorsRepository.findOne(id)).ifPresent(item -> {
+			item.setLogo(null);
+			save(item);
+		});
+	}
+
+	@Override
+	public void deleteGallery(String metadata, Integer id) {
+		Optional.ofNullable(esVendorsRepository.findOne(id)).ifPresent(item -> {
+			item.setGallery(
+					item.getGallery().stream().filter(gitem -> !gitem.equals(metadata)).collect(Collectors.toList()));
+			save(item);
+		});
+	}
+
 }

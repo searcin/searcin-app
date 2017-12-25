@@ -2,12 +2,22 @@ package com.searcin.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.searcin.view.Dto;
+
 public class UsersDto {
+	@JsonView(Dto.User.id.class)
 	private String id;
+	@JsonView(Dto.User.name.class)
 	private String name;
+	@JsonView(Dto.User.auth.class)
 	private String username;
+	@JsonView(Dto.User.auth.class)
 	private String password;
-	private List<NameDto> roles;
+	@JsonView(Dto.User.roles.class)
+	private List<String> roles;
+	@JsonView(Dto.User.token.class)
+	private String token;
 
 	public String getId() {
 		return id;
@@ -41,11 +51,19 @@ public class UsersDto {
 		this.password = password;
 	}
 
-	public List<NameDto> getRoles() {
+	public List<String> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(List<NameDto> roles) {
+	public void setRoles(List<String> roles) {
 		this.roles = roles;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 }

@@ -10,7 +10,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
-public class JWTParser {
+public class TokenGenerator {
 	
 	public String getToken(String username, List<String> roles) {
 		return "Bearer " + Jwts.builder().setSubject(username).claim("roles", roles).setIssuedAt(new Date())

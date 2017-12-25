@@ -50,6 +50,12 @@ public interface IngestionService {
 
 	void update(ESVendors vendor);
 
-	void save(List<String> collect, String type, Integer id);
+	void saveLogo(String logo, Integer id);
+
+	void saveGallery(String metadata, Integer id);
+
+	void deleteLogo(Integer id);
+
+	void deleteGallery(String metadata, Integer id);
 
 }

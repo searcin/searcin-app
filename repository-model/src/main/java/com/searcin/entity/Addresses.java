@@ -3,7 +3,6 @@ package com.searcin.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,11 +21,7 @@ public class Addresses extends Auditable {
 	@Column(name = "id")
 	private Integer id;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "vendor_id")
-	private Vendors vendor;
-
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne
 	@JoinColumn(name = "area_id")
 	private Areas area;
 
@@ -60,14 +55,6 @@ public class Addresses extends Auditable {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public Vendors getVendor() {
-		return vendor;
-	}
-
-	public void setVendor(Vendors vendor) {
-		this.vendor = vendor;
 	}
 
 	public Areas getArea() {

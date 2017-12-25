@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.searcin.constant.AssetType;
-import com.searcin.document.ESVendors;
 import com.searcin.entity.Areas;
 import com.searcin.entity.Categories;
 import com.searcin.entity.Services;
@@ -16,7 +14,6 @@ import com.searcin.entity.SubCategories;
 import com.searcin.entity.Vendors;
 import com.searcin.mapper.ESMapper;
 import com.searcin.service.AreasService;
-import com.searcin.service.AssetsService;
 import com.searcin.service.CategoriesService;
 import com.searcin.service.IngestionService;
 import com.searcin.service.ServicesService;
@@ -47,10 +44,6 @@ public class IngestionController {
 
 	@Autowired
 	private VendorsService vendorsService;
-	
-
-	@Autowired
-	private AssetsService assetsService;
 	
 	@RequestMapping(value = "/synces")
 	public void esPush() {
@@ -84,16 +77,7 @@ public class IngestionController {
 		List<Vendors> vendors = vendorsService.findAll();		
 		if(vendors != null && vendors.size() > 0) {
 			ingestionService.vendor(vendors.stream()
-					.map(item -> {
-					ESVendors esVendor = esMapper.toES(item);
-					esVendor.setLogo(assetsService.list(item.getId(), AssetType.LOGO.getValue()).stream()
-						.map(asset -> assetsService.getHost() + asset.getKey())
-						.collect(Collectors.toList()));
-					esVendor.setGallery(assetsService.list(item.getId(), AssetType.GALLERY.getValue()).stream()
-							.map(asset -> assetsService.getHost() + asset.getKey())
-							.collect(Collectors.toList()));
-					return esVendor;
-					}).collect(Collectors.toList()));
+					.map(item -> esMapper.toES(item)).collect(Collectors.toList()));
 		}		
 	}
 }

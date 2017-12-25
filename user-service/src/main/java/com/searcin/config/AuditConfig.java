@@ -9,7 +9,7 @@ import com.searcin.service.impl.AuditorAwareImpl;
 
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
-public class JPAConfig {
+public class AuditConfig {
 	@Bean
 	public AuditorAware<String> auditorAware() {
 		return new AuditorAwareImpl();

@@ -20,4 +20,7 @@ public interface UsersRepository extends Repository<Users, Long> {
 	List<Users> findNames();
 
 	Users findOneByUsername(String username);
+	
+	@Query("select u from Users u where u.username = ?1 and u.password = ?2")
+	Users findByUsernameAndPassword(String username, String password);
 }

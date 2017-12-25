@@ -13,6 +13,9 @@ public class VendorsDto {
 
 	@JsonView(Dto.Vendor.name.class)
 	private String name;
+	
+	@JsonView(Dto.Vendor.name.class)
+	private String ownerName;
 
 	@JsonView(Dto.Vendor.description.class)
 	private String description;
@@ -61,6 +64,14 @@ public class VendorsDto {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}
 
 	public String getDescription() {

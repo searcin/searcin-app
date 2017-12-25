@@ -2,44 +2,73 @@ package com.searcin.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.searcin.entity.Addresses;
+import com.searcin.entity.Contacts;
 import com.searcin.entity.Services;
 import com.searcin.entity.Vendors;
-import com.searcin.repository.CategoriesRepository;
-import com.searcin.repository.ClassRangeRepository;
+import com.searcin.exception.ObjectNotFoundException;
 import com.searcin.repository.ServicesRepository;
-import com.searcin.repository.SubCategoriesRepository;
 import com.searcin.repository.VendorsRepository;
+import com.searcin.service.VendorAssetService;
 import com.searcin.service.VendorsService;
 
 @Service
 public class VendorsServiceImpl implements VendorsService {
-	
+
 	@Autowired
 	private VendorsRepository vendorsRepository;
-	
+
 	@Autowired
 	private ServicesRepository servicesRepository;
 	
+	@Value("${assets.vendor}")
+	private String vendor;	
+
 	@Autowired
-	private ClassRangeRepository classRangeRepository;
-	
-	@Autowired
-	private CategoriesRepository categoriesRepository;
-	
-	@Autowired
-	private SubCategoriesRepository subCategoriesRepository;
+	private VendorAssetService vendorAssetService;
 	
 	@Override
 	public List<Vendors> findAll() {
 		return vendorsRepository.findAll();
 	}
+	
+	@Override
+	public Vendors findById(Integer id) {
+		return Optional.ofNullable(vendorsRepository.findById(id))
+				.orElseThrow(() -> new ObjectNotFoundException("Vendor not found!"));
+	}
+	
+	@Override
+	public Addresses findAddress(Integer id) {
+		return findById(id).getAddress();
+	}
+	
+	@Override
+	public Contacts findContact(Integer id) {
+		return findById(id).getContact();
+	}
+
+	@Override
+	public void saveAddress(Addresses address, Integer id) {
+		Vendors vendor = findById(id);
+		vendor.setAddress(address);
+		save(vendor);
+	}
+	
+	@Override
+	public void saveContact(Contacts contact, Integer id) {
+		Vendors vendor = findById(id);
+		vendor.setContact(contact);
+		save(vendor);
+	}	
 
 	@Override
 	public List<Vendors> findNames() {
@@ -48,27 +77,20 @@ public class VendorsServiceImpl implements VendorsService {
 
 	@Override
 	public Vendors save(Vendors vendors) {
-		vendors.setCategory(categoriesRepository.findById(vendors.getCategory().getId()));
-		vendors.setSubCategory(subCategoriesRepository.findById(vendors.getSubCategory().getId()));
-		vendors.setClassRange(classRangeRepository.findById(vendors.getClassRange().getId()));
-		vendors.setServices(vendors.getServices().stream()
-				.map(item -> servicesRepository.findById(item.getId())).collect(Collectors.toList()));
 		return vendorsRepository.save(vendors);
 	}
 
 	@Override
 	public void delete(Integer id) {
+		//delete assets
+		vendorAssetService.deleteAssetsByVendor(id);
+		//delete row
 		vendorsRepository.deleteById(id);
 	}
 
 	@Override
 	public void deleteAll() {
 		vendorsRepository.deleteAll();
-	}
-
-	@Override
-	public Vendors findById(Integer id) {
-		return vendorsRepository.findById(id);
 	}
 
 	@Override
@@ -85,7 +107,7 @@ public class VendorsServiceImpl implements VendorsService {
 	public void saveServices(Integer vendorId, List<Integer> services) {
 		Vendors vendor = findById(vendorId);
 		List<Services> listOfServices = new ArrayList<>();
-		for(Integer id:services) {
+		for (Integer id : services) {
 			listOfServices.add(servicesRepository.findById(id));
 		}
 		vendor.setServices(listOfServices);
@@ -102,4 +124,19 @@ public class VendorsServiceImpl implements VendorsService {
 		return vendorsRepository.findNames(pageable);
 	}
 
+	@Override
+	public void restore(Integer id) {
+		Vendors vendor = findById(id);
+		vendor.setIsActive(true);
+		save(vendor);
+	}
+
+	@Override
+	public void trash(Integer id) {
+		Vendors vendor = findById(id);
+		vendor.setIsActive(false);
+		save(vendor);
+	}
+
+	
 }

@@ -15,6 +15,6 @@ public interface ContactsRepository extends Repository<Contacts, Long> {
 
 	Contacts save(Contacts contact);
 
-	Contacts findByVendor_id(Integer id);
+	//Contacts findByVendor_id(Integer id);
 
 }

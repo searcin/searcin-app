@@ -4,22 +4,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
+public class ObjectNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
-	public ResourceNotFoundException() {
+	public ObjectNotFoundException() {
 		super();
 	}
 
-	public ResourceNotFoundException(String message, Throwable cause) {
+	public ObjectNotFoundException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ResourceNotFoundException(String message) {
+	public ObjectNotFoundException(String message) {
 		super(message);
 	}
 
-	public ResourceNotFoundException(Throwable cause) {
+	public ObjectNotFoundException(Throwable cause) {
 		super(cause);
 	}
 }
