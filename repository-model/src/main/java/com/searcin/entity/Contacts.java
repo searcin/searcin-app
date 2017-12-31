@@ -1,16 +1,12 @@
 package com.searcin.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.searcin.listener.ContactsListener;
-
 @Entity
-@EntityListeners(ContactsListener.class)
 @Table(name = "contacts")
 public class Contacts extends Auditable {
 	@Id
@@ -90,6 +86,13 @@ public class Contacts extends Auditable {
 
 	public void setTwitter(String twitter) {
 		this.twitter = twitter;
+	}
+
+	@Override
+	public String toString() {
+		return "Contacts [id=" + id + ", phone=" + phone + ", mobile=" + mobile + ", email=" + email + ", website="
+				+ website + ", facebook=" + facebook + ", twitter=" + twitter + ", getUpdatedOn()=" + getUpdatedOn()
+				+ ", getUpdatedBy()=" + getUpdatedBy() + "]";
 	}
 	
 	

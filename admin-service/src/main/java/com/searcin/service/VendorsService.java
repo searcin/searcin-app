@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.searcin.constant.AssetType;
 import com.searcin.entity.Addresses;
+import com.searcin.entity.Assets;
 import com.searcin.entity.Contacts;
 import com.searcin.entity.Vendors;
 
@@ -39,10 +42,18 @@ public interface VendorsService {
 
 	Addresses findAddress(Integer id);
 
-	void saveAddress(Addresses address, Integer id);
+	Addresses saveAddress(Addresses address, Integer id);
 
-	void saveContact(Contacts entity, Integer id);
+	Contacts saveContact(Contacts entity, Integer id);
 
 	Contacts findContact(Integer id);
+
+	Boolean isExists(Integer id);
+	
+	List<Assets> uploadAsset(Integer id, MultipartFile file, AssetType type);
+
+	List<Assets> getAssets(Integer id, AssetType vendorlogo);
+
+	Assets deleteAsset(Integer id, Integer assetId);
 
 }

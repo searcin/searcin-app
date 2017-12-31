@@ -7,11 +7,4 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>repository-model</artifactId>
-	<dependencies>
-		<dependency>
-			<groupId>com.searcin</groupId>
-			<artifactId>ingestion-service</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-	</dependencies>
 </project>

@@ -2,7 +2,6 @@ package com.searcin.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -10,10 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.searcin.listener.AddressesListener;
-
 @Entity
-@EntityListeners(AddressesListener.class)
 @Table(name = "addresses")
 public class Addresses extends Auditable {
 	@Id
@@ -127,6 +123,13 @@ public class Addresses extends Auditable {
 
 	public void setLng(Double lng) {
 		this.lng = lng;
+	}
+
+	@Override
+	public String toString() {
+		return "Addresses [id=" + id + ", area=" + area + ", doorno=" + doorno + ", building=" + building + ", nearby="
+				+ nearby + ", address1=" + address1 + ", address2=" + address2 + ", pincode=" + pincode + ", lat=" + lat
+				+ ", lng=" + lng + ", getUpdatedOn()=" + getUpdatedOn() + ", getUpdatedBy()=" + getUpdatedBy() + "]";
 	}
 
 	

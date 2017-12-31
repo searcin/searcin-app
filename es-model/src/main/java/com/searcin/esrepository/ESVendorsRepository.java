@@ -15,6 +15,9 @@ public interface ESVendorsRepository extends ElasticsearchRepository<ESVendors, 
 
 	@Query("{\"query\":{\"term\":{\"category.id\":?0}}}")
 	Iterable<ESVendors> findByCategoryId(Integer id);
+	
+	@Query("{\"query\":{\"term\":{\"sub_category.id\":?0}}}")
+	Iterable<ESVendors> findBySubCategoryId(Integer id);
 
 	@Query("{\"query\":{\"term\":{\"services.id\":?0}}}")
 	Iterable<ESVendors> findByServiceId(Integer id);

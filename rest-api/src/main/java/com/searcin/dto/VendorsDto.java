@@ -39,7 +39,7 @@ public class VendorsDto {
 	private ContactsDto contact;
 
 	@JsonView(Dto.Vendor.logo.class)
-	private List<AssetsDto> logo;
+	private AssetsDto logo;
 
 	@JsonView(Dto.Vendor.images.class)
 	private List<AssetsDto> images;
@@ -145,12 +145,12 @@ public class VendorsDto {
 	public void setContact(ContactsDto contact) {
 		this.contact = contact;
 	}
-
-	public List<AssetsDto> getLogo() {
+	
+	public AssetsDto getLogo() {
 		return logo;
 	}
 
-	public void setLogo(List<AssetsDto> logo) {
+	public void setLogo(AssetsDto logo) {
 		this.logo = logo;
 	}
 

@@ -48,8 +48,6 @@ public interface IngestionService {
 
 	void delete(ESVendors esVendor);
 
-	void update(ESVendors vendor);
-
 	void saveLogo(String logo, Integer id);
 
 	void saveGallery(String metadata, Integer id);
@@ -57,5 +55,15 @@ public interface IngestionService {
 	void deleteLogo(Integer id);
 
 	void deleteGallery(String metadata, Integer id);
+
+	void deleteAreaById(Integer id);
+
+	void deleteCategoryById(Integer id);
+
+	void deleteServiceById(Integer id);
+
+	void deleteSubCategoryById(Integer id);
+
+	void deleteVendorById(Integer id);
 
 }

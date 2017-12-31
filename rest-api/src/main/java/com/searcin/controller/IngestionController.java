@@ -45,11 +45,14 @@ public class IngestionController {
 	@Autowired
 	private VendorsService vendorsService;
 	
-	@RequestMapping(value = "/synces")
-	public void esPush() {
-		
-		ingestionService.reset();
-		
+	@RequestMapping(value = "/reset")
+	public void rest() {		
+		ingestionService.reset();		
+	}
+	
+	@RequestMapping(value = "/sync")
+	public void push() {
+		ingestionService.reset();	
 		List<Services> services = servicesService.findAll();		
 		if(services != null && services.size() > 0) {
 			ingestionService.service(services.stream()
@@ -78,6 +81,6 @@ public class IngestionController {
 		if(vendors != null && vendors.size() > 0) {
 			ingestionService.vendor(vendors.stream()
 					.map(item -> esMapper.toES(item)).collect(Collectors.toList()));
-		}		
+		}
 	}
 }

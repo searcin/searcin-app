@@ -14,6 +14,9 @@ import com.searcin.entity.Vendors;
 @Transactional
 public interface VendorsRepository extends Repository<Vendors, Long> {
 	
+	@Query("select count(*) > 0 from Vendors v where v.isActive = true and v.id = ?1")
+	Boolean isExists(Integer id);
+	
 	@Query("select v from Vendors v where v.isActive = true")
 	List<Vendors> findAll();
 	
@@ -24,12 +27,6 @@ public interface VendorsRepository extends Repository<Vendors, Long> {
 	Page<Vendors> findNames(Pageable pageable);
 	
 	Vendors findById(Integer id);
-	
-	@Query("select new Vendors(v.id,v.address) from Vendors v where v.isActive = true and v.id = ?1")
-	Vendors findAddressByVendor(Integer id);
-
-	@Query("select new Vendors(v.id,v.contact) from Vendors v where v.isActive = true and v.id = ?1")
-	Vendors findContactByVendor(Integer id);
 	
 	Integer countByAddressAreaId(Integer id);
 	
@@ -50,5 +47,8 @@ public interface VendorsRepository extends Repository<Vendors, Long> {
 	void deleteById(Integer id);
 
 	Vendors saveAndFlush(Vendors vendors);
+	
+	@Query("select count(a) from Assets as a, Vendors as v where v.id = ?1 and a member of v.assets and a.type = ?2")
+	Integer countOfAssets(Integer id, String type);
 
 }

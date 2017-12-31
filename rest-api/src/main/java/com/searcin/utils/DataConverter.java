@@ -3,6 +3,7 @@ package com.searcin.utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.searcin.constant.AssetType;
+import com.searcin.document.ESCategories;
 import com.searcin.document.ESVendors;
 import com.searcin.dto.AddressesDto;
 import com.searcin.dto.AreasDto;
@@ -37,7 +40,7 @@ import com.searcin.entity.Roles;
 import com.searcin.entity.Services;
 import com.searcin.entity.SubCategories;
 import com.searcin.entity.Users;
-import com.searcin.entity.VendorAsset;
+import com.searcin.entity.Assets;
 import com.searcin.entity.Vendors;
 
 @Component
@@ -47,7 +50,34 @@ public class DataConverter {
 	private ModelMapper modelMapper;
 
 	public VendorsDto toDto(Vendors vendor) {
-		return modelMapper.map(vendor, VendorsDto.class);
+		VendorsDto vendorsDto = new VendorsDto();
+		new ModelMapper().createTypeMap(Vendors.class, VendorsDto.class)
+			.addMappings(mapper -> mapper.skip(VendorsDto::setAddress))
+			.addMappings(mapper -> mapper.skip(VendorsDto::setContact))
+			.addMappings(mapper -> mapper.skip(VendorsDto::setImages))
+			.addMappings(mapper -> mapper.skip(VendorsDto::setLogo)).map(vendor, vendorsDto);
+		return vendorsDto;
+	}
+	
+	public VendorsDto toDetailDto(Vendors vendor) {
+		VendorsDto vendorsDto = new VendorsDto();
+		new ModelMapper().createTypeMap(Vendors.class, VendorsDto.class)
+			.addMappings(mapper -> mapper.skip(VendorsDto::setImages))
+			.addMappings(mapper -> mapper.skip(VendorsDto::setLogo)).map(vendor, vendorsDto);
+		
+		AssetsDto logo = new AssetsDto();
+		List<AssetsDto> gallery = new ArrayList<>();
+		
+		if(vendor.getAssets() != null) {
+			logo = vendor.getAssets().stream().filter(item -> AssetType.VENDORLOGO.getValue().equals(item.getType()))
+					.findFirst().map(item -> toDto(item)).get();
+			gallery = vendor.getAssets().stream().filter(item -> AssetType.VENDORGALLERY.getValue().equals(item.getType()))
+					.map(item -> toDto(item)).collect(Collectors.toList());
+		}
+		
+		vendorsDto.setLogo(logo);
+		vendorsDto.setImages(gallery);
+		return vendorsDto;
 	}
 
 	public Vendors toEntity(VendorsDto vendor) {
@@ -271,7 +301,7 @@ public class DataConverter {
 			String type = (String) item.get("type");
 			Map<String, Object> source = (Map<String, Object>) item.get("source");
 			return new SuggestDto((Integer) source.get("id"), (String) source.get("name"), type, 
-					(String) source.get("description"), (List<String>) source.get("logo"));
+					(String) source.get("description"), (String) source.get("logo"));
 		}).collect(Collectors.toList());
 	}
 
@@ -279,7 +309,11 @@ public class DataConverter {
 		return modelMapper.map(vendor, VendorsDto.class);
 	}
 
-	public AssetsDto toDto(VendorAsset logo) {
+	public AssetsDto toDto(Assets logo) {
 		return new AssetsDto(logo.getId(), logo.getMetadata(), logo.getUpdatedBy(), logo.getUpdatedOn());
+	}
+
+	public CategoriesDto toDto(ESCategories category) {
+		return modelMapper.map(category, CategoriesDto.class);
 	}
 }

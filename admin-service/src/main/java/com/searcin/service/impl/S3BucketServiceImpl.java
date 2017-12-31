@@ -30,7 +30,7 @@ public class S3BucketServiceImpl implements S3BucketService {
 
 	@Autowired
 	private AmazonS3Client amazonS3Client;
-	
+
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
@@ -53,8 +53,7 @@ public class S3BucketServiceImpl implements S3BucketService {
 
 	@Override
 	public List<S3ObjectSummary> list(String prefix) {
-		return amazonS3Client
-				.listObjects(new ListObjectsRequest().withBucketName(bucket).withPrefix(prefix))
+		return amazonS3Client.listObjects(new ListObjectsRequest().withBucketName(bucket).withPrefix(prefix))
 				.getObjectSummaries().stream().sorted(Comparator.comparing(S3ObjectSummary::getLastModified))
 				.collect(Collectors.toList());
 
@@ -62,8 +61,7 @@ public class S3BucketServiceImpl implements S3BucketService {
 
 	@Override
 	public void upload(MultipartFile file, String path) throws IOException {
-		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, path,
-				file.getInputStream(), null);
+		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, path, file.getInputStream(), null);
 		putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
 		amazonS3Client.putObject(putObjectRequest);
 	}

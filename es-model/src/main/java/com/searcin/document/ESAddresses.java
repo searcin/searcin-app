@@ -122,6 +122,13 @@ public class ESAddresses {
 	public void setLng(Double lng) {
 		this.location.put("lon", lng);
 	}
+
+	@Override
+	public String toString() {
+		return "ESAddresses [id=" + id + ", area=" + area + ", doorno=" + doorno + ", building=" + building
+				+ ", nearby=" + nearby + ", address1=" + address1 + ", address2=" + address2 + ", pincode=" + pincode
+				+ ", location=" + location + "]";
+	}
 	
 	
 }

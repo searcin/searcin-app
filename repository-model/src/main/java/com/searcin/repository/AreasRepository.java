@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
@@ -29,4 +30,8 @@ public interface AreasRepository extends Repository<Areas, Long> {
 	void delete(Areas areas);
 
 	void deleteAll();
+	
+	@Modifying
+	@Query("update Areas a set a.isActive = ?1 where a.id = ?2")
+	void update(Boolean isActive, Integer id);
 }

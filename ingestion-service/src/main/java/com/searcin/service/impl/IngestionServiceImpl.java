@@ -10,14 +10,12 @@ import javax.annotation.PostConstruct;
 import org.elasticsearch.common.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.stereotype.Service;
 
-import com.searcin.constant.ESVendorFields;
 import com.searcin.document.ESAddresses;
 import com.searcin.document.ESAreas;
 import com.searcin.document.ESCategories;
@@ -130,10 +128,11 @@ public class IngestionServiceImpl implements IngestionService {
 	public void save(ESAreas esarea) {
 		// save area
 		esAreasRepository.save(esarea);
-
+		log.info("Area saved/updated to es {} ", esarea);
 		// save vendor
 		esVendorsRepository.findByAreaId(esarea.getId()).forEach(item -> {
 			item.getAddress().setArea(esarea.getId(), esarea.getName());
+			log.info("Updating es vendor address of {}", item.getName());
 			esVendorsRepository.save(item);
 		});
 	}
@@ -141,6 +140,13 @@ public class IngestionServiceImpl implements IngestionService {
 	@Override
 	public void delete(ESAreas area) {
 		esAreasRepository.delete(area);
+		log.info("Area deleted from es {}", area);
+	}
+	
+	@Override
+	public void deleteAreaById(Integer id) {
+		esAreasRepository.delete(id);	
+		log.info("Area with id {} deleted from es", id);
 	}
 
 	@Override
@@ -148,6 +154,7 @@ public class IngestionServiceImpl implements IngestionService {
 		ESVendors vendor = esVendorsRepository.findOne(id);
 		vendor.setAddress(address);
 		esVendorsRepository.save(vendor);
+		log.info("Address with vendor id {} saved to es {}", id, address);
 	}
 
 	@Override
@@ -163,7 +170,13 @@ public class IngestionServiceImpl implements IngestionService {
 
 	@Override
 	public void delete(ESCategories es) {
+		//save sub category
 		esCategoriesRepository.delete(es);
+		// save vendor
+		esVendorsRepository.findBySubCategoryId(es.getId()).forEach(item -> {
+			item.setSubCategory(new ESNested(es.getId(), es.getName()));
+			esVendorsRepository.save(item);
+		});
 	}
 
 	@Override
@@ -181,6 +194,7 @@ public class IngestionServiceImpl implements IngestionService {
 		ESVendors vendor = esVendorsRepository.findOne(id);
 		vendor.setContact(contact);
 		esVendorsRepository.save(vendor);
+		log.info("Contact with vendor id {} saved to es {}", id, contact);
 	}
 
 	@Override
@@ -212,15 +226,7 @@ public class IngestionServiceImpl implements IngestionService {
 	public void delete(ESVendors esVendor) {
 		esVendorsRepository.delete(esVendor);
 	}
-
-	@Override
-	public void update(ESVendors esVendor) {
-		ESVendors vendor = new ESVendors();
-		BeanUtils.copyProperties(esVendor, vendor, ESVendorFields.ADDRESS.getField(), ESVendorFields.CONTACT.getField(),
-				ESVendorFields.GALLERY.getField(), ESVendorFields.LOGO.getField());
-		esVendorsRepository.save(vendor);
-	}
-
+	
 	@Override
 	public void saveLogo(String logo, Integer id) {
 		Optional.ofNullable(esVendorsRepository.findOne(id)).ifPresent(item -> {
@@ -252,6 +258,26 @@ public class IngestionServiceImpl implements IngestionService {
 					item.getGallery().stream().filter(gitem -> !gitem.equals(metadata)).collect(Collectors.toList()));
 			save(item);
 		});
+	}
+
+	@Override
+	public void deleteCategoryById(Integer id) {
+		esCategoriesRepository.delete(id);
+	}
+
+	@Override
+	public void deleteServiceById(Integer id) {
+		esServicesRepository.delete(id);
+	}
+
+	@Override
+	public void deleteSubCategoryById(Integer id) {
+		esSubCategoriesRepository.delete(id);	
+	}
+
+	@Override
+	public void deleteVendorById(Integer id) {
+		esVendorsRepository.delete(id);
 	}
 
 }

@@ -2,16 +2,12 @@ package com.searcin.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.searcin.listener.AreasListener;
-
 @Entity
-@EntityListeners(AreasListener.class)
 @Table(name = "areas")
 public class Areas extends Auditable {
 	
@@ -23,8 +19,8 @@ public class Areas extends Auditable {
 	@Column(name = "name")
 	private String name;
 	
-	@Column(name = "is_active",insertable=false)
-	private Boolean isActive;
+	@Column(name = "is_active")
+	private Boolean isActive = true;
 	
 	public Areas() {
 		
@@ -61,6 +57,8 @@ public class Areas extends Auditable {
 
 	@Override
 	public String toString() {
-		return "Areas [id=" + id + ", name=" + name + ", isActive=" + isActive + "]";
+		return "Areas [id=" + id + ", name=" + name + ", isActive=" + isActive + ", getUpdatedOn()=" + getUpdatedOn()
+				+ ", getUpdatedBy()=" + getUpdatedBy() + "]";
 	}
+
 }

@@ -16,8 +16,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
-import com.searcin.constant.ESSuggest;
-import com.searcin.constant.ESType;
+import com.searcin.constant.DocumentType;
 import com.searcin.document.ESAreas;
 import com.searcin.document.ESCategories;
 import com.searcin.document.ESServices;
@@ -56,21 +55,17 @@ public class SearchServiceImpl implements SearchService {
 
 	@Override
 	public List<Map<String, Object>> suggest(String qs) {
-		BoolQueryBuilder query = QueryBuilders.boolQuery();
-		for (ESSuggest suggest : ESSuggest.values()) {
-			query.should(QueryBuilders.matchQuery("_type", ESType.valueOf(suggest.toString()).getName())
-					.boost(suggest.getBoost()));
-		}
+		BoolQueryBuilder query = QueryBuilders.boolQuery();		
+		query.should(QueryBuilders.matchQuery("_type", DocumentType.VENDORS.getName())).boost(1.0f);
 		query.must(QueryBuilders.matchPhrasePrefixQuery("name.key", qs));
 		SearchQuery searchQuery = new NativeSearchQueryBuilder().withQuery(query).withIndices(indexName)
-				.withTypes(ESType.AREAS.getName(), ESType.CATEGORIES.getName(), ESType.SUBCATEGORIES.getName(),
-						ESType.SERVICES.getName(), ESType.VENDORS.getName())
-				.build();
+				.build();		
 		return elasticsearchTemplate.query(searchQuery, new ResultsExtractor<List<Map<String, Object>>>() {
 			@Override
 			public List<Map<String, Object>> extract(SearchResponse response) {
 				List<Map<String, Object>> result = new ArrayList<>();
 				response.getHits().forEach(item -> {
+					System.out.println(item.getType());
 					Map<String, Object> resultObj = new HashMap<>();
 					resultObj.put("type", item.getType());
 					resultObj.put("source", item.getSource());
@@ -104,5 +99,12 @@ public class SearchServiceImpl implements SearchService {
 	@Override
 	public ESAreas findAreaById(Integer id) {
 		return esAreasRepository.findOne(id);
+	}
+
+	@Override
+	public List<ESCategories> findCategories() {
+		List<ESCategories> esCategories = new ArrayList<>();
+		esCategoriesRepository.findAll().forEach(esCategories::add);
+		return esCategories;
 	}
 }

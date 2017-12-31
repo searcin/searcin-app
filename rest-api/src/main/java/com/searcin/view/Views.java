@@ -36,7 +36,7 @@ public interface Views {
 	public static interface VendorAudit extends Views.VendorBasicId, Dto.Category.id, Dto.SubCategory.id, Dto.ClassRange.id, 
 													Dto.Service.id, Dto.Vendor.audit {}
 	public static interface VendorDetailId extends Views.VendorBasicId, Dto.Vendor.address, Dto.Vendor.contact, 
-													Dto.Vendor.logo, Dto.Vendor.images, Dto.Asset.url {}
+													Dto.Vendor.logo, Dto.Vendor.images, Dto.Asset.url, Views.AddressDetail, Views.ContactDetail, Views.AssetList {}
 	public static interface VendorPanel extends Dto.Vendor.id, Dto.Vendor.name, Dto.Vendor.logo, Dto.Asset.url,
 													Dto.Vendor.description, Dto.Vendor.address, Dto.Address.name, Dto.Address.location,
 													Dto.Address.basic {}

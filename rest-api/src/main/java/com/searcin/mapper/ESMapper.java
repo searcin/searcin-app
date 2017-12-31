@@ -22,9 +22,10 @@ import com.searcin.document.ESVendors;
 import com.searcin.entity.Addresses;
 import com.searcin.entity.Areas;
 import com.searcin.entity.Categories;
+import com.searcin.entity.Contacts;
 import com.searcin.entity.Services;
 import com.searcin.entity.SubCategories;
-import com.searcin.entity.VendorAsset;
+import com.searcin.entity.Assets;
 import com.searcin.entity.Vendors;
 
 @Component
@@ -60,11 +61,11 @@ public class ESMapper {
 				.addMappings(mapper -> mapper.skip(ESVendors::setContact)).map(vendor, esVendor);		
 		String logo = null;
 		List<String> gallery = new ArrayList<>();		
-		List<VendorAsset> assets = vendor.getAssets();		
+		List<Assets> assets = vendor.getAssets();		
 		if(assets != null) {
-			logo = assets.stream().filter(item -> item.getAssetType().equals(AssetType.LOGO.getValue()))
+			logo = assets.stream().filter(item -> item.getType().equals(AssetType.VENDORLOGO.getValue()))
 					.findFirst().map(item -> item.getMetadata()).orElse(null);
-			gallery = assets.stream().filter(item -> item.getAssetType().equals(AssetType.GALLERY.getValue()))
+			gallery = assets.stream().filter(item -> item.getType().equals(AssetType.VENDORGALLERY.getValue()))
 					.map(item -> item.getMetadata()).collect(Collectors.toList());
 		}		
 		esVendor.setLogo(logo);
@@ -90,5 +91,20 @@ public class ESMapper {
 	private ESContacts toESContact(Vendors vendor) {
 		return Optional.ofNullable(vendor.getContact()).map(contact -> modelMapper.map(contact, ESContacts.class))
 				.orElse(null);
+	}
+
+	public ESAddresses toES(Addresses address) {
+		ESAddresses esAddress = new ESAddresses();
+		new ModelMapper().createTypeMap(Addresses.class, ESAddresses.class)
+				.addMappings(mapper -> mapper.skip(ESAddresses::setLocation)).map(address, esAddress);
+		Map<String, Double> location = new HashMap<>();
+		location.put("lat", address.getLat());
+		location.put("lon", address.getLng());
+		esAddress.setLocation(location);
+		return esAddress;
+	}
+	
+	public ESContacts toES(Contacts contact) {
+		return modelMapper.map(contact, ESContacts.class);
 	}
 }

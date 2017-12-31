@@ -2,16 +2,12 @@ package com.searcin.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.searcin.listener.ServicesListener;
-
 @Entity
-@EntityListeners(ServicesListener.class)
 @Table(name = "services")
 public class Services extends Auditable {
 
@@ -26,8 +22,8 @@ public class Services extends Auditable {
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "is_active", insertable = false)
-	private Boolean isActive;
+	@Column(name = "is_active")
+	private Boolean isActive = true;
 
 	public Services() {
 

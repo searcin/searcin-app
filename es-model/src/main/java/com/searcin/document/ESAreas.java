@@ -48,5 +48,11 @@ public class ESAreas {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "ESAreas [id=" + id + ", name=" + name + "]";
 	}	
+	
 }

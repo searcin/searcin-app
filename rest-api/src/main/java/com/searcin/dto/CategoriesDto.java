@@ -52,5 +52,12 @@ public class CategoriesDto {
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+
+	@Override
+	public String toString() {
+		return "CategoriesDto [id=" + id + ", name=" + name + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy
+				+ "]";
+	}
+	
 	
 }

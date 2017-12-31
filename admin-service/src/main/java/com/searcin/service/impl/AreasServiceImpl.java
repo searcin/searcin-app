@@ -3,8 +3,8 @@ package com.searcin.service.impl;
 import java.util.List;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +19,8 @@ import com.searcin.service.AreasService;
 
 @Service
 public class AreasServiceImpl implements AreasService {
+	
+	private final Logger log = LoggerFactory.getLogger(AreasServiceImpl.class);
 
 	@Autowired
 	private AreasRepository areasRepository;
@@ -37,8 +39,10 @@ public class AreasServiceImpl implements AreasService {
 	}
 
 	@Override
-	public Areas save(Areas areas) {
-		return areasRepository.save(areas);
+	public Areas save(Areas area) {
+		area =  areasRepository.save(area);
+		log.info("Area saved/updated to database {}", area);
+		return area;
 	}
 
 	@Override
@@ -54,30 +58,31 @@ public class AreasServiceImpl implements AreasService {
 
 	@Override
 	public void trash(Integer id) {
-		if (vendorsRepository.countByAddressAreaId(id) > 0) {
+		Integer numOfVendors = vendorsRepository.countByAddressAreaId(id);
+		if (numOfVendors > 0) {
+			log.error("Number of vendors associated with that area id {}. So can't trash!", numOfVendors);
 			throw new ObjectRemovalException("The Area is associated with some vendor. Can't Remove temporarily!");
 		}
 		else {
-			Areas area = findById(id);
-			area.setIsActive(false);
-			save(area);
+			log.info("Area trashing from database {}", id);
+			areasRepository.update(false, id);
 		}
 	}
 
 	@Override
-	@Transactional
 	public void restore(Integer id) {
-		Areas area = findById(id);
-		area.setIsActive(true);
-		save(area);
+		areasRepository.update(true, id);
+		log.info("Area restored from database {}", id);
 	}
 
 	@Override
 	public void delete(Integer id) {
 		Areas area = findById(id);
 		if (area.getIsActive()) {
+			log.error("Area is active! {}", area);
 			throw new ObjectRemovalException("The Area is active. Can't Remove permanently!");
 		}
+		log.info("Removing area permanently from database {}", area);
 		areasRepository.delete(area);
 	}
 

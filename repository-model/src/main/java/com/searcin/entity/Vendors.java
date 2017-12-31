@@ -5,12 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,20 +21,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 
-import com.searcin.listener.VendorsListener;
-
 @Entity
-@EntityListeners(VendorsListener.class)
-@DynamicUpdate
 @Table(name = "vendors")
 public class Vendors extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Access(AccessType.PROPERTY)
 	@Column(name = "id")
 	private Integer id;
 
@@ -77,11 +68,13 @@ public class Vendors extends Auditable {
 				inverseJoinColumns = @JoinColumn(name = "service_id", referencedColumnName = "id"))
 	private List<Services> services;
 
-	@OneToMany(mappedBy="vendor", orphanRemoval = true)
-	private List<VendorAsset> assets;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinTable(name = "vendor_asset", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"),
+				inverseJoinColumns = @JoinColumn(name = "asset_id", referencedColumnName = "id"))
+	private List<Assets> assets;
 
 	@Column(name = "is_active")
-	private Boolean isActive;
+	private Boolean isActive = true;
 
 	@CreatedDate
 	@Temporal(TemporalType.TIMESTAMP)
@@ -145,11 +138,11 @@ public class Vendors extends Auditable {
 		this.ownerName = ownerName;
 	}
 
-	public List<VendorAsset> getAssets() {
+	public List<Assets> getAssets() {
 		return assets;
 	}
 
-	public void setAssets(List<VendorAsset> assets) {
+	public void setAssets(List<Assets> assets) {
 		this.assets = assets;
 	}
 

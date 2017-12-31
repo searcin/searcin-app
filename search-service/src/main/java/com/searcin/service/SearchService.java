@@ -22,4 +22,6 @@ public interface SearchService {
 	ESServices findServiceById(Integer id);
 
 	ESAreas findAreaById(Integer areaId);
+
+	List<ESCategories> findCategories();
 }
