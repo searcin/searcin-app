@@ -22,11 +22,11 @@ import com.searcin.document.ESCategories;
 import com.searcin.document.ESServices;
 import com.searcin.document.ESSubCategories;
 import com.searcin.document.ESVendors;
-import com.searcin.esrepository.ESAreasRepository;
-import com.searcin.esrepository.ESCategoriesRepository;
-import com.searcin.esrepository.ESServicesRepository;
-import com.searcin.esrepository.ESSubCategoriesRepository;
-import com.searcin.esrepository.ESVendorsRepository;
+import com.searcin.repository.ESAreasRepository;
+import com.searcin.repository.ESCategoriesRepository;
+import com.searcin.repository.ESServicesRepository;
+import com.searcin.repository.ESSubCategoriesRepository;
+import com.searcin.repository.ESVendorsRepository;
 import com.searcin.service.SearchService;
 
 @Service
@@ -65,7 +65,6 @@ public class SearchServiceImpl implements SearchService {
 			public List<Map<String, Object>> extract(SearchResponse response) {
 				List<Map<String, Object>> result = new ArrayList<>();
 				response.getHits().forEach(item -> {
-					System.out.println(item.getType());
 					Map<String, Object> resultObj = new HashMap<>();
 					resultObj.put("type", item.getType());
 					resultObj.put("source", item.getSource());

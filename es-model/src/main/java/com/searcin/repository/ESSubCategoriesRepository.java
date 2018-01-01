@@ -1,4 +1,4 @@
-package com.searcin.esrepository;
+package com.searcin.repository;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
