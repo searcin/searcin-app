@@ -25,6 +25,7 @@
 		<module>user-service</module>
 		<module>search-service</module>
 		<module>ingestion-service</module>
+		<module>aws-service</module>
 	</modules>
 	<dependencies>
 		<dependency>

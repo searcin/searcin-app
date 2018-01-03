@@ -12,6 +12,11 @@
 			<groupId>com.searcin</groupId>
 			<artifactId>repository-model</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.searcin</groupId>
+			<artifactId>aws-service</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>	
 	</dependencies>
 </project>

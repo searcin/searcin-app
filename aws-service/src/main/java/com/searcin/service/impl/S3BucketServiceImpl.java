@@ -42,15 +42,6 @@ public class S3BucketServiceImpl implements S3BucketService {
 		return "https://s3." + region + ".amazonaws.com/" + bucket + "/";
 	}
 
-	@PostConstruct
-	public void test() {
-
-		list("vendor").forEach(item -> {
-			DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, item.getKey());
-			amazonS3Client.deleteObject(deleteObjectRequest);
-		});
-	}
-
 	@Override
 	public List<S3ObjectSummary> list(String prefix) {
 		return amazonS3Client.listObjects(new ListObjectsRequest().withBucketName(bucket).withPrefix(prefix))

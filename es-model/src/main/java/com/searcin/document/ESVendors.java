@@ -58,6 +58,9 @@ public class ESVendors {
 	@JsonProperty("gallery")
 	private List<String> gallery;
 	
+	@JsonProperty("timings")
+	private List<ESTimings> timings;
+	
 	@JsonProperty("created_on")
 	private Date createdOn;
 
@@ -155,6 +158,14 @@ public class ESVendors {
 
 	public void setGallery(List<String> gallery) {
 		this.gallery = gallery;
+	}
+
+	public List<ESTimings> getTimings() {
+		return timings;
+	}
+
+	public void setTimings(List<ESTimings> timings) {
+		this.timings = timings;
 	}
 
 	public Date getCreatedOn() {

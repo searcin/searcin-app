@@ -66,4 +66,11 @@ public interface Dto {
 		public static interface roles {}
 		public static interface token {}
 	}
+	interface Timings {
+		public static interface id {}
+		public static interface day {}
+		public static interface label {}
+		public static interface detail {}
+		public static interface audit extends id, day, label, detail{}
+	}
 }

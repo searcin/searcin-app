@@ -1,27 +1,7 @@
 package com.searcin.document;
 
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldIndex;
-import org.springframework.data.elasticsearch.annotations.FieldType;
-import org.springframework.data.elasticsearch.annotations.InnerField;
-import org.springframework.data.elasticsearch.annotations.MultiField;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-
-@Document(indexName = "#{ESConfig.indexName}", type = "nested")
 public class ESNested {
-	@JsonProperty("id")
 	private Integer id;
-	@JsonProperty("name")
-	@MultiField(
-			mainField = @Field(type=FieldType.String, store = true, analyzer = "case_insensitive"),
-			otherFields = {
-					@InnerField(suffix="key", index = FieldIndex.analyzed, 
-							searchAnalyzer = "standard",  indexAnalyzer = "standard",
-						    store = true, type = FieldType.String)
-			})
 	private String name;
 
 	public ESNested() {

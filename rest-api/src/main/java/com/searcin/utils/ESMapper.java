@@ -1,6 +1,5 @@
-package com.searcin.mapper;
+package com.searcin.utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,20 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.searcin.constant.AssetType;
+import com.searcin.constant.WeekDay;
 import com.searcin.document.ESAddresses;
 import com.searcin.document.ESAreas;
 import com.searcin.document.ESCategories;
 import com.searcin.document.ESContacts;
 import com.searcin.document.ESServices;
 import com.searcin.document.ESSubCategories;
+import com.searcin.document.ESTimings;
 import com.searcin.document.ESVendors;
 import com.searcin.entity.Addresses;
 import com.searcin.entity.Areas;
+import com.searcin.entity.Assets;
 import com.searcin.entity.Categories;
 import com.searcin.entity.Contacts;
 import com.searcin.entity.Services;
 import com.searcin.entity.SubCategories;
-import com.searcin.entity.Assets;
+import com.searcin.entity.Timings;
 import com.searcin.entity.Vendors;
 
 @Component
@@ -58,21 +60,33 @@ public class ESMapper {
 				.addMappings(mapper -> mapper.skip(ESVendors::setLogo))
 				.addMappings(mapper -> mapper.skip(ESVendors::setGallery))
 				.addMappings(mapper -> mapper.skip(ESVendors::setAddress))
-				.addMappings(mapper -> mapper.skip(ESVendors::setContact)).map(vendor, esVendor);		
-		String logo = null;
-		List<String> gallery = new ArrayList<>();		
+				.addMappings(mapper -> mapper.skip(ESVendors::setContact))
+				.addMappings(mapper -> mapper.skip(ESVendors::setTimings)).map(vendor, esVendor);
 		List<Assets> assets = vendor.getAssets();		
-		if(assets != null) {
-			logo = assets.stream().filter(item -> item.getType().equals(AssetType.VENDORLOGO.getValue()))
-					.findFirst().map(item -> item.getMetadata()).orElse(null);
-			gallery = assets.stream().filter(item -> item.getType().equals(AssetType.VENDORGALLERY.getValue()))
-					.map(item -> item.getMetadata()).collect(Collectors.toList());
+		if(assets.size() > 0) {
+			esVendor.setLogo(assets.stream().filter(item -> item.getType().equals(AssetType.VENDORLOGO.getValue()))
+					.findFirst().map(item -> item.getMetadata()).orElse(null));
+			esVendor.setGallery(assets.stream().filter(item -> item.getType().equals(AssetType.VENDORGALLERY.getValue()))
+					.map(item -> item.getMetadata()).collect(Collectors.toList()));
+		}
+		List<Timings> timings = vendor.getTiming();
+		if(timings.size() > 0) {
+			esVendor.setTimings(timings.stream().map(item -> toES(item)).collect(Collectors.toList()));
 		}		
-		esVendor.setLogo(logo);
-		esVendor.setGallery(gallery);
 		esVendor.setAddress(toESAddress(vendor));
 		esVendor.setContact(toESContact(vendor));
 		return esVendor;
+	}
+
+	private ESTimings toES(Timings timing) {
+		ESTimings esTiming = new ESTimings();
+		new ModelMapper().createTypeMap(Timings.class, ESTimings.class)
+		.addMappings(mapper -> mapper.skip(ESTimings::setStartAt))
+		.addMappings(mapper -> mapper.skip(ESTimings::setEndAt)).map(timing, esTiming);
+		esTiming.setLabel(WeekDay.getLabelByDay(timing.getDay()));
+		esTiming.setStartAt(TimeUtils.getString(timing.getStartAt()));
+		esTiming.setEndAt(TimeUtils.getString(timing.getEndAt()));
+		return esTiming;
 	}
 
 	private ESAddresses toESAddress(Vendors vendor) {

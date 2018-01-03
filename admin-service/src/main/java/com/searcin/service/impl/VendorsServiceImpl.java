@@ -1,7 +1,6 @@
 package com.searcin.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,15 +18,15 @@ import com.searcin.constant.AssetType;
 import com.searcin.entity.Addresses;
 import com.searcin.entity.Assets;
 import com.searcin.entity.Contacts;
-import com.searcin.entity.Services;
+import com.searcin.entity.Timings;
 import com.searcin.entity.Vendors;
 import com.searcin.exception.AwsS3Exception;
 import com.searcin.exception.ObjectNotFoundException;
 import com.searcin.exception.OutOfLimitException;
-import com.searcin.repository.AssetsRepository;
-import com.searcin.repository.ServicesRepository;
 import com.searcin.repository.VendorsRepository;
+import com.searcin.service.AssetsService;
 import com.searcin.service.S3BucketService;
+import com.searcin.service.ServicesService;
 import com.searcin.service.VendorsService;
 
 @Service
@@ -45,14 +44,14 @@ public class VendorsServiceImpl implements VendorsService {
 	private VendorsRepository vendorsRepository;
 
 	@Autowired
-	private ServicesRepository servicesRepository;
+	private ServicesService servicesService;
 
 	@Autowired
 	private S3BucketService s3BucketService;
 
 	@Autowired
-	private AssetsRepository assetsRepository;
-
+	private AssetsService assetsService;
+	
 	@Override
 	public Boolean isExists(Integer id) {
 		return vendorsRepository.isExists(id);
@@ -109,9 +108,6 @@ public class VendorsServiceImpl implements VendorsService {
 
 	@Override
 	public void delete(Integer id) {
-		// delete assets
-		// vendorAssetService.deleteAssetsByVendor(id);
-		// delete row
 		vendorsRepository.deleteById(id);
 	}
 
@@ -133,11 +129,7 @@ public class VendorsServiceImpl implements VendorsService {
 	@Override
 	public void saveServices(Integer vendorId, List<Integer> services) {
 		Vendors vendor = findById(vendorId);
-		List<Services> listOfServices = new ArrayList<>();
-		for (Integer id : services) {
-			listOfServices.add(servicesRepository.findById(id));
-		}
-		vendor.setServices(listOfServices);
+		vendor.setServices(services.stream().map(item -> servicesService.findById(item)).collect(Collectors.toList()));
 		save(vendor);
 	}
 
@@ -166,10 +158,13 @@ public class VendorsServiceImpl implements VendorsService {
 	}
 
 	@Override
-	public List<Assets> uploadAsset(Integer id, MultipartFile file, AssetType type) {
-		if (vendorsRepository.isExists(id)) {
-			String path = environment + "/" + vendor + "/" + id + "/" + type.getValue() + "/"
-					+ file.getOriginalFilename();
+	public Assets uploadAsset(Integer id, MultipartFile file, AssetType type) {
+		
+		// set path
+		String path = environment + "/" + vendor + "/" + id + "/" + type.getValue() + "/"
+				+ file.getOriginalFilename();
+		
+		if (vendorsRepository.isExists(id)) {			
 			if (vendorsRepository.countOfAssets(id, type.getValue()) < type.getMaxCount()) {
 				try {
 					log.info("Uploading to s3 bucket..........");
@@ -177,12 +172,10 @@ public class VendorsServiceImpl implements VendorsService {
 
 					log.info("Uploading the key to database...");
 					Vendors vendor = findById(id);
-					List<Assets> assets = vendor.getAssets();
-					assets.add(new Assets(type.getValue(), path, s3BucketService.getHost() + path));
-					vendor.setAssets(assets);
-					Vendors savedVendor = save(vendor);
-					return savedVendor.getAssets().stream().filter(item -> item.getType().equals(type.getValue()))
-							.collect(Collectors.toList());
+					Assets asset = assetsService.save(new Assets(type.getValue(), path, s3BucketService.getHost() + path));
+					vendor.mergeAssets(asset);
+					save(vendor);
+					return asset;
 				} catch (IOException e) {
 					throw new AwsS3Exception("Input stream conversion issue {}", e);
 				}
@@ -204,20 +197,31 @@ public class VendorsServiceImpl implements VendorsService {
 	public Assets deleteAsset(Integer id, Integer assetId) {
 		// get asset from database
 		log.info("Getting assets from database........");
-		Assets asset = Optional.ofNullable(assetsRepository.findById(assetId))
-				.orElseThrow(() -> new ObjectNotFoundException("Asset Not found!"));
-		
+		Assets asset = assetsService.findById(assetId);
+
 		log.info("Deleting from aws s3 bucket........");
 		s3BucketService.delete(asset.getKey());
-		
+
 		log.info("Removing from database........");
 		Vendors vendor = findById(id);
 		List<Assets> assets = vendor.getAssets();
 		assets.remove(asset);
 		vendor.setAssets(assets);
 		save(vendor);
-		
 		return asset;
+	}
+
+	@Override
+	public List<Timings> saveTiming(Integer id, List<Timings> timings) {
+		Vendors vendor = findById(id);
+		vendor.mergeTiming(timings);
+		vendor = save(vendor);
+		return vendor.getTiming();
+	}
+
+	@Override
+	public List<Timings> getTiming(Integer id) {
+		return findById(id).getTiming();
 	}
 
 }

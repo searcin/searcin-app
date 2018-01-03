@@ -42,5 +42,7 @@ public interface Views {
 													Dto.Address.basic {}
 	
 	public static interface UserBasic extends Dto.User.name, Dto.User.roles, Dto.User.token {}
+	
+	public static interface TimingAudit extends Dto.Timings.audit {}
 }
 

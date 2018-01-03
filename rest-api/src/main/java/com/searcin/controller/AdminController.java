@@ -1,5 +1,6 @@
 package com.searcin.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.searcin.constant.AssetType;
+import com.searcin.constant.WeekDay;
 import com.searcin.dto.AddressesDto;
 import com.searcin.dto.AreasDto;
 import com.searcin.dto.AssetsDto;
@@ -30,6 +32,7 @@ import com.searcin.dto.ClassRangeDto;
 import com.searcin.dto.ContactsDto;
 import com.searcin.dto.ServicesDto;
 import com.searcin.dto.SubCategoriesDto;
+import com.searcin.dto.TimingsDto;
 import com.searcin.dto.VendorsDto;
 import com.searcin.entity.Addresses;
 import com.searcin.entity.Areas;
@@ -38,11 +41,11 @@ import com.searcin.entity.Categories;
 import com.searcin.entity.Contacts;
 import com.searcin.entity.Services;
 import com.searcin.entity.SubCategories;
+import com.searcin.entity.Timings;
 import com.searcin.entity.Vendors;
 import com.searcin.exception.FileNotFoundException;
 import com.searcin.exception.InvalidFieldException;
 import com.searcin.exception.ValidationException;
-import com.searcin.mapper.ESMapper;
 import com.searcin.service.AreasService;
 import com.searcin.service.CategoriesService;
 import com.searcin.service.ClassRangeService;
@@ -53,6 +56,7 @@ import com.searcin.service.TrashService;
 import com.searcin.service.VendorsService;
 import com.searcin.utils.DataConverter;
 import com.searcin.utils.DataValidator;
+import com.searcin.utils.ESMapper;
 import com.searcin.view.Views;
 
 @RestController
@@ -118,7 +122,7 @@ public class AdminController {
 		log.info("Database Saving/Updating address for vendor id : " + id);
 		Addresses address = vendorsService.saveAddress(convert.toEntity(addressesDto), id);
 		log.info("{} saved in database", address);
-		
+
 		log.info("ES Saving/Updating address for vendor id : " + id);
 		ingestionService.save(esMapper.toES(address), id);
 	}
@@ -141,7 +145,7 @@ public class AdminController {
 		Areas area = Optional.ofNullable(areasDto.getName()).map(item -> areasService.save(convert.toEntity(areasDto)))
 				.orElseThrow(() -> new ValidationException("Name cannot be empty!"));
 		log.info("{} saved.", area);
-		
+
 		log.info("ES Saving/Updating area...");
 		ingestionService.save(esMapper.toES(area));
 	}
@@ -164,7 +168,7 @@ public class AdminController {
 	public void restoreArea(@PathVariable Integer id) {
 		log.info("Restoring area {} back", id);
 		areasService.restore(id);
-		
+
 		Areas area = areasService.findById(id);
 		log.info("Saving area back to es {}", area);
 		ingestionService.save(esMapper.toES(area));
@@ -186,10 +190,11 @@ public class AdminController {
 	@RequestMapping(value = "/category/save", method = RequestMethod.POST)
 	public void saveCategory(@RequestBody CategoriesDto categoryDto) {
 		log.info("Saving/Updating a category {}", categoryDto);
-		Categories category = Optional.ofNullable(categoryDto.getName()).map(item -> categoriesService.save(convert.toEntity(categoryDto)))
+		Categories category = Optional.ofNullable(categoryDto.getName())
+				.map(item -> categoriesService.save(convert.toEntity(categoryDto)))
 				.orElseThrow(() -> new ValidationException("Name cannot be empty!"));
 		log.info("Category {} saved", category);
-		
+
 		log.info("Saving the category to ES");
 		ingestionService.save(esMapper.toES(category));
 	}
@@ -241,7 +246,7 @@ public class AdminController {
 		log.info("Saving/Updating a contact for vendor id : " + id);
 		Contacts contact = vendorsService.saveContact(convert.toEntity(contactsDto), id);
 		log.info("Saved contact entity {}", contact);
-		
+
 		log.info("Saving to es");
 		ingestionService.save(esMapper.toES(contact), id);
 	}
@@ -270,7 +275,7 @@ public class AdminController {
 		log.info("Saving/Updating a service : " + servicesDto.getName());
 		Services service = servicesService.save(convert.toEntity(servicesDto));
 		log.info("Service saved {}", service);
-		
+
 		ingestionService.save(esMapper.toES(service));
 		log.info("Saved to ES");
 	}
@@ -285,7 +290,7 @@ public class AdminController {
 	public void trashService(@PathVariable Integer id) {
 		log.info("Trashing the service {}", id);
 		servicesService.trash(id);
-		
+
 		log.info("Removing from es");
 		ingestionService.deleteServiceById(id);
 	}
@@ -294,10 +299,10 @@ public class AdminController {
 	public void restoreService(@PathVariable Integer id) {
 		log.info("Restoring the service back to database");
 		servicesService.restore(id);
-		
+
 		Services service = servicesService.findById(id);
 		log.info("Restored service {}", service);
-		
+
 		log.info("Saving back to ES");
 		ingestionService.save(esMapper.toES(service));
 	}
@@ -330,7 +335,7 @@ public class AdminController {
 	public void restoreSubCategory(@PathVariable Integer id) {
 		log.info("Restoring back sub category by id");
 		subCategoriesService.restore(id);
-		
+
 		log.info("Saving back to es a subcategory");
 		SubCategories subCategory = subCategoriesService.findById(id);
 		log.info("Restored subCategory, {}", subCategory);
@@ -391,12 +396,12 @@ public class AdminController {
 
 		log.info("Saving/Updating vendor : " + vendorsDto.getName());
 		Vendors vendor = vendorsService.save(convert.toEntity(vendorsDto));
-		
+
 		log.info("Saved vendor {}", vendor);
-		
+
 		log.info("Saving to es");
 		ingestionService.save(esMapper.toES(vendor));
-		
+
 		return convert.toDto(vendor);
 	}
 
@@ -410,7 +415,7 @@ public class AdminController {
 	public void trashVendor(@PathVariable Integer id) {
 		log.info("Trash a vendor {}", id);
 		vendorsService.trash(id);
-		
+
 		log.info("Removing it from es");
 		ingestionService.deleteVendorById(id);
 	}
@@ -419,7 +424,7 @@ public class AdminController {
 	public void restoreVendor(@PathVariable Integer id) {
 		log.info("Restoring the vendor back");
 		vendorsService.restore(id);
-		
+
 		Vendors vendor = vendorsService.findById(id);
 		ingestionService.save(esMapper.toES(vendor));
 	}
@@ -432,10 +437,10 @@ public class AdminController {
 		if (!validate.isValidImage(multipartFile))
 			throw new ValidationException("Not a valid image format!");
 
-		return vendorsService.uploadAsset(id, multipartFile, AssetType.VENDORLOGO).stream().findFirst().map(item -> {
-			ingestionService.saveLogo(item.getMetadata(), id);
-			return convert.toDto(item);
-		}).orElse(null);
+		Assets asset = vendorsService.uploadAsset(id, multipartFile, AssetType.VENDORLOGO);
+		log.info("Saving to ES vendor........{}", asset);
+		ingestionService.saveLogo(asset.getMetadata(), id);
+		return convert.toDto(asset);
 	}
 
 	@JsonView(Views.AssetAudit.class)
@@ -446,19 +451,17 @@ public class AdminController {
 	}
 
 	@RequestMapping(value = "/vendor/{id}/gallery/upload", method = RequestMethod.POST)
-	public List<AssetsDto> uploadVendorGallery(@RequestParam("file") MultipartFile multipartFile,
-			@PathVariable Integer id) {
+	public AssetsDto uploadVendorGallery(@RequestParam("file") MultipartFile multipartFile, @PathVariable Integer id) {
 		if (multipartFile == null)
 			throw new FileNotFoundException("File not found!");
 
 		if (!validate.isValidImage(multipartFile))
 			throw new ValidationException("Not a valid image format!");
 
-		return vendorsService.uploadAsset(id, multipartFile, AssetType.VENDORGALLERY).stream().map(item -> {
-			log.info("Saving to ES vendor........");
-			ingestionService.saveGallery(item.getMetadata(), id);
-			return convert.toDto(item);
-		}).collect(Collectors.toList());
+		Assets asset = vendorsService.uploadAsset(id, multipartFile, AssetType.VENDORGALLERY);
+		log.info("Saving to ES vendor........{}", asset);
+		ingestionService.saveGallery(asset.getMetadata(), id);
+		return convert.toDto(asset);
 	}
 
 	@JsonView(Views.AssetAudit.class)
@@ -475,29 +478,50 @@ public class AdminController {
 		VendorsDto detail = convert.toDetailDto(vendorsService.detail(id));
 		return detail;
 	}
-	
+
 	@RequestMapping(value = "/vendor/{id}/logo/delete")
 	public void deleteLogo(@PathVariable Integer id, @RequestParam Integer assetId) {
 		log.info("Deleting logo");
 		Assets asset = vendorsService.deleteAsset(id, assetId);
-		
+
 		log.info("Deleted logo {}", asset);
 		log.info("Delete it from es");
 		ingestionService.deleteLogo(id);
 	}
-	
+
 	@RequestMapping(value = "/vendor/{id}/gallery/delete")
 	public void deleteGallery(@PathVariable Integer id, @RequestParam Integer assetId) {
 		log.info("Deleting gallery");
 		Assets asset = vendorsService.deleteAsset(id, assetId);
-		
+
 		log.info("Deleted gallery {}", asset);
 		log.info("Delete it from es");
-		ingestionService.deleteGallery(asset.getMetadata(), id);;
+		ingestionService.deleteGallery(asset.getMetadata(), id);
 	}
 
 	@RequestMapping(value = "/trash", method = RequestMethod.GET)
 	public List<Map<String, Object>> trashItems(Pageable pageable) {
 		return trashService.getItems(pageable);
+	}
+
+	@JsonView(Views.TimingAudit.class)
+	@RequestMapping(value = "vendor/{id}/timings", method = RequestMethod.GET)
+	public List<TimingsDto> timings(@PathVariable Integer id) {
+		List<Timings> timings = vendorsService.getTiming(id);
+		List<TimingsDto> timingsDto = new ArrayList<>();
+		if (timings.size() == 0) {
+			for (WeekDay day : WeekDay.values()) {
+				timingsDto.add(new TimingsDto(day.getValue(), day.getLabel()));
+			}
+		} else {
+			timingsDto = timings.stream().map(item -> convert.toDto(item)).collect(Collectors.toList());
+		}
+		return timingsDto;
+	}
+
+	@RequestMapping(value = "vendor/{id}/timing/save", method = RequestMethod.POST)
+	public void timing(@RequestBody List<TimingsDto> timingsDto, @PathVariable Integer id) {
+		vendorsService.saveTiming(id,
+				timingsDto.stream().map(item -> convert.toEntity(item)).collect(Collectors.toList()));
 	}
 }

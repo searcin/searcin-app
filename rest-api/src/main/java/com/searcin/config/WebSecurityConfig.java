@@ -32,7 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				// authenticate all remaining URLS
 				.anyRequest().fullyAuthenticated().and()
 				// adding JWT filter
-				.addFilterBefore(new JWTFilter(), UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(new AuthFilterConfig(), UsernamePasswordAuthenticationFilter.class)
 				// enabling the basic authentication
 				.httpBasic().and()
 				// configuring the session as state less. Which means there is

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.searcin.constant.AssetType;
+import com.searcin.constant.WeekDay;
 import com.searcin.document.ESCategories;
 import com.searcin.document.ESVendors;
 import com.searcin.dto.AddressesDto;
@@ -29,18 +30,20 @@ import com.searcin.dto.NameDto;
 import com.searcin.dto.ServicesDto;
 import com.searcin.dto.SubCategoriesDto;
 import com.searcin.dto.SuggestDto;
+import com.searcin.dto.TimingsDto;
 import com.searcin.dto.UsersDto;
 import com.searcin.dto.VendorsDto;
 import com.searcin.entity.Addresses;
 import com.searcin.entity.Areas;
+import com.searcin.entity.Assets;
 import com.searcin.entity.Categories;
 import com.searcin.entity.ClassRange;
 import com.searcin.entity.Contacts;
 import com.searcin.entity.Roles;
 import com.searcin.entity.Services;
 import com.searcin.entity.SubCategories;
+import com.searcin.entity.Timings;
 import com.searcin.entity.Users;
-import com.searcin.entity.Assets;
 import com.searcin.entity.Vendors;
 
 @Component
@@ -52,29 +55,30 @@ public class DataConverter {
 	public VendorsDto toDto(Vendors vendor) {
 		VendorsDto vendorsDto = new VendorsDto();
 		new ModelMapper().createTypeMap(Vendors.class, VendorsDto.class)
-			.addMappings(mapper -> mapper.skip(VendorsDto::setAddress))
-			.addMappings(mapper -> mapper.skip(VendorsDto::setContact))
-			.addMappings(mapper -> mapper.skip(VendorsDto::setImages))
-			.addMappings(mapper -> mapper.skip(VendorsDto::setLogo)).map(vendor, vendorsDto);
+				.addMappings(mapper -> mapper.skip(VendorsDto::setAddress))
+				.addMappings(mapper -> mapper.skip(VendorsDto::setContact))
+				.addMappings(mapper -> mapper.skip(VendorsDto::setImages))
+				.addMappings(mapper -> mapper.skip(VendorsDto::setLogo)).map(vendor, vendorsDto);
 		return vendorsDto;
 	}
-	
+
 	public VendorsDto toDetailDto(Vendors vendor) {
 		VendorsDto vendorsDto = new VendorsDto();
 		new ModelMapper().createTypeMap(Vendors.class, VendorsDto.class)
-			.addMappings(mapper -> mapper.skip(VendorsDto::setImages))
-			.addMappings(mapper -> mapper.skip(VendorsDto::setLogo)).map(vendor, vendorsDto);
-		
+				.addMappings(mapper -> mapper.skip(VendorsDto::setImages))
+				.addMappings(mapper -> mapper.skip(VendorsDto::setLogo)).map(vendor, vendorsDto);
+
 		AssetsDto logo = new AssetsDto();
 		List<AssetsDto> gallery = new ArrayList<>();
-		
-		if(vendor.getAssets() != null) {
+
+		if (vendor.getAssets() != null) {
 			logo = vendor.getAssets().stream().filter(item -> AssetType.VENDORLOGO.getValue().equals(item.getType()))
 					.findFirst().map(item -> toDto(item)).get();
-			gallery = vendor.getAssets().stream().filter(item -> AssetType.VENDORGALLERY.getValue().equals(item.getType()))
-					.map(item -> toDto(item)).collect(Collectors.toList());
+			gallery = vendor.getAssets().stream()
+					.filter(item -> AssetType.VENDORGALLERY.getValue().equals(item.getType())).map(item -> toDto(item))
+					.collect(Collectors.toList());
 		}
-		
+
 		vendorsDto.setLogo(logo);
 		vendorsDto.setImages(gallery);
 		return vendorsDto;
@@ -191,7 +195,7 @@ public class DataConverter {
 		Addresses addresses = modelMapper.map(addressesDto, Addresses.class);
 		Vendors vendors = new Vendors();
 		vendors.setId(id);
-		//addresses.setVendor(vendors);
+		// addresses.setVendor(vendors);
 		return addresses;
 	}
 
@@ -241,7 +245,7 @@ public class DataConverter {
 
 	public Contacts toEntity(ContactsDto contactsDto, Integer id) {
 		return modelMapper.map(contactsDto, Contacts.class);
-		
+
 	}
 
 	public ServicesDto toServiceDto(Services services) {
@@ -294,13 +298,13 @@ public class DataConverter {
 	public SubCategories toSubCategoryEntity(NameAuditDto subCategoriesDto) {
 		return modelMapper.map(subCategoriesDto, SubCategories.class);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<SuggestDto> toDto(List<Map<String, Object>> suggest) {
 		return suggest.stream().map(item -> {
 			String type = (String) item.get("type");
 			Map<String, Object> source = (Map<String, Object>) item.get("source");
-			return new SuggestDto((Integer) source.get("id"), (String) source.get("name"), type, 
+			return new SuggestDto((Integer) source.get("id"), (String) source.get("name"), type,
 					(String) source.get("description"), (String) source.get("logo"));
 		}).collect(Collectors.toList());
 	}
@@ -315,5 +319,27 @@ public class DataConverter {
 
 	public CategoriesDto toDto(ESCategories category) {
 		return modelMapper.map(category, CategoriesDto.class);
+	}
+
+	public Timings toEntity(TimingsDto timingsDto) {
+		Timings timing = new Timings();
+		new ModelMapper().createTypeMap(TimingsDto.class, Timings.class)
+					.addMappings(mapper -> mapper.skip(Timings::setStartAt))
+					.addMappings(mapper -> mapper.skip(Timings::setEndAt))
+					.map(timingsDto, timing);		
+		timing.setStartAt(TimeUtils.getTime(timingsDto.getStartAt()));
+		timing.setEndAt(TimeUtils.getTime(timingsDto.getEndAt()));
+		return timing;
+	}
+
+	public TimingsDto toDto(Timings timing) {
+		TimingsDto timingsDto = new TimingsDto();
+		new ModelMapper().createTypeMap(Timings.class, TimingsDto.class)
+				.addMappings(mapper -> mapper.skip(TimingsDto::setStartAt))
+				.addMappings(mapper -> mapper.skip(TimingsDto::setEndAt)).map(timing, timingsDto);
+		timingsDto.setLabel(WeekDay.getLabelByDay(timing.getDay()));
+		timingsDto.setStartAt(TimeUtils.getString(timing.getStartAt()));
+		timingsDto.setEndAt(TimeUtils.getString(timing.getEndAt()));		
+		return timingsDto;
 	}
 }

@@ -10,6 +10,7 @@ import com.searcin.constant.AssetType;
 import com.searcin.entity.Addresses;
 import com.searcin.entity.Assets;
 import com.searcin.entity.Contacts;
+import com.searcin.entity.Timings;
 import com.searcin.entity.Vendors;
 
 public interface VendorsService {
@@ -50,10 +51,14 @@ public interface VendorsService {
 
 	Boolean isExists(Integer id);
 	
-	List<Assets> uploadAsset(Integer id, MultipartFile file, AssetType type);
+	Assets uploadAsset(Integer id, MultipartFile file, AssetType type);
 
 	List<Assets> getAssets(Integer id, AssetType vendorlogo);
 
 	Assets deleteAsset(Integer id, Integer assetId);
+
+	List<Timings> saveTiming(Integer id, List<Timings> timings);
+
+	List<Timings> getTiming(Integer id);
 
 }

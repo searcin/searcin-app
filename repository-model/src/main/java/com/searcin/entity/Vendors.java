@@ -3,6 +3,7 @@ package com.searcin.entity;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
@@ -50,13 +51,11 @@ public class Vendors extends Auditable {
 	private SubCategories subCategory;
 
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinTable(name = "vendor_address", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"), 
-				inverseJoinColumns = @JoinColumn(name = "address_id", referencedColumnName = "id"))
+	@JoinTable(name = "vendor_address", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "address_id", referencedColumnName = "id"))
 	private Addresses address;
 
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinTable(name = "vendor_contact", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"), 
-				inverseJoinColumns = @JoinColumn(name = "contact_id", referencedColumnName = "id"))
+	@JoinTable(name = "vendor_contact", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "contact_id", referencedColumnName = "id"))
 	private Contacts contact;
 
 	@OneToOne
@@ -64,14 +63,16 @@ public class Vendors extends Auditable {
 	private ClassRange classRange;
 
 	@ManyToMany
-	@JoinTable(name = "vendor_services", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"), 
-				inverseJoinColumns = @JoinColumn(name = "service_id", referencedColumnName = "id"))
+	@JoinTable(name = "vendor_services", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "service_id", referencedColumnName = "id"))
 	private List<Services> services;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinTable(name = "vendor_asset", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"),
-				inverseJoinColumns = @JoinColumn(name = "asset_id", referencedColumnName = "id"))
+	@JoinTable(name = "vendor_asset", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "asset_id", referencedColumnName = "id"))
 	private List<Assets> assets;
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinTable(name = "vendor_timing", joinColumns = @JoinColumn(name = "vendor_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "timing_id", referencedColumnName = "id"))
+	private List<Timings> timing;
 
 	@Column(name = "is_active")
 	private Boolean isActive = true;
@@ -82,7 +83,6 @@ public class Vendors extends Auditable {
 	private Date createdOn;
 
 	public Vendors() {
-
 	}
 
 	public Vendors(Integer id) {
@@ -145,6 +145,10 @@ public class Vendors extends Auditable {
 	public void setAssets(List<Assets> assets) {
 		this.assets = assets;
 	}
+	
+	public void mergeAssets(Assets asset) {
+		this.assets.add(asset);
+	}
 
 	public String getDescription() {
 		return description;
@@ -200,6 +204,37 @@ public class Vendors extends Auditable {
 
 	public void setClassRange(ClassRange classRange) {
 		this.classRange = classRange;
+	}
+
+	public List<Timings> getTiming() {
+		return timing;
+	}
+	
+	public void setTiming(List<Timings> timing) {
+		this.timing = timing;
+	}
+
+	public void mergeTiming(List<Timings> timing) {
+		if (this.timing.size() > 0) {			
+			Integer index = 0;
+			for (Timings existing : this.timing) {
+				for (Timings changed : timing) {
+					if (existing.getId().equals(changed.getId())) {
+						if (!Optional.ofNullable(changed.getStartAt()).map(item -> item.getTime())
+								.orElse(0L).equals(Optional.ofNullable(existing.getStartAt()).map(item -> item.getTime())
+										.orElse(0L)) || !Optional.ofNullable(changed.getEndAt()).map(item -> item.getTime())
+								.orElse(0L).equals(Optional.ofNullable(existing.getEndAt()).map(item -> item.getTime())
+										.orElse(0L))) {
+							this.timing.set(index, changed);
+						}
+						break;
+					}
+				}
+				index++;
+			}
+		} else {
+			timing.forEach(this.timing::add);
+		}
 	}
 
 	public Boolean getIsActive() {

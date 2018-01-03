@@ -12,13 +12,13 @@ import com.searcin.entity.Categories;
 import com.searcin.entity.Services;
 import com.searcin.entity.SubCategories;
 import com.searcin.entity.Vendors;
-import com.searcin.mapper.ESMapper;
 import com.searcin.service.AreasService;
 import com.searcin.service.CategoriesService;
 import com.searcin.service.IngestionService;
 import com.searcin.service.ServicesService;
 import com.searcin.service.SubCategoriesService;
 import com.searcin.service.VendorsService;
+import com.searcin.utils.ESMapper;
 
 @RestController
 @RequestMapping("/ingest")

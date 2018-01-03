@@ -11,15 +11,15 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "timings")
-public class Timings {
+public class Timings extends Auditable {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
 	
-	@Column(name = "name")
-	private String name;
+	@Column(name = "week_day")
+	private Integer day;
 	
 	@Column(name = "start_at")
 	private Time startAt;
@@ -35,12 +35,12 @@ public class Timings {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public Integer getDay() {
+		return day;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setDay(Integer day) {
+		this.day = day;
 	}
 
 	public Time getStartAt() {
